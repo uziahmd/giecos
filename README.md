@@ -21,24 +21,24 @@ git clone <repo-url> && cd giecos
    ```
 2. **Install root dependencies**
    ```bash
-npm install
+   pnpm install
    ```
 3. **Install API dependencies**
    ```bash
-pnpm --filter ./api install
+   pnpm --filter ./api install
    ```
 4. **Create environment variables**
-   Copy `.env.sample` to `api/.env` and adjust values as needed.  At minimum set `DATABASE_URL` (SQLite by default) and any JWT secret or custom port.
+   Copy `.env.sample` to `api/.env` and adjust values as needed.  At minimum set `DATABASE_URL`, `JWT_SECRET`, and `PORT`.
    ```bash
-cp .env.sample api/.env
+   cp .env.sample api/.env
    ```
 5. **Run database migrations** and seed sample data:
    ```bash
-# apply migrations
-npm run prisma migrate dev
+   # apply migrations
+   pnpm prisma migrate dev
 
-# seed the database
-npm run seed
+   # seed the database
+   pnpm run seed
    ```
 
 ## Development
@@ -47,13 +47,13 @@ Open two terminals:
 
 1. **Start the API**
    ```bash
-npm run dev:api
+   pnpm dev:api
    ```
    The server listens on `http://localhost:4000` and exposes endpoints under `/api`.
 
 2. **Start the front‑end**
    ```bash
-npm run dev
+   pnpm dev
    ```
    Vite serves the React app on `http://localhost:8080` and proxies API requests to the backend.
 
