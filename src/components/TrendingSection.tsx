@@ -1,11 +1,27 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { sampleProducts } from '@/lib/data';
+import { useQuery } from '@tanstack/react-query';
+import { fetcher } from '@/lib/api';
+import type { Product } from '@/lib/types';
 
 const TrendingSection: React.FC = () => {
-  // Show first 3 products as trending
-  const trendingProducts = sampleProducts.slice(0, 3);
+  const { data: products = [], isLoading } = useQuery<Product[]>(
+    ['/api/products'],
+    () => fetcher<Product[]>('/api/products')
+  );
+
+  const trendingProducts = products.slice(0, 3);
+
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <p>Loading...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">

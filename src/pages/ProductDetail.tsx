@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { Plus, Minus } from 'lucide-react';
-import { sampleProducts } from '@/lib/data';
+import { useQuery } from '@tanstack/react-query';
+import { fetcher } from '@/lib/api';
+import type { Product } from '@/lib/types';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,7 +15,20 @@ const ProductDetail: React.FC = () => {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  const product = sampleProducts.find(p => p.slug === slug);
+  const { data: products = [], isLoading } = useQuery<Product[]>(
+    ['/api/products'],
+    () => fetcher<Product[]>('/api/products')
+  );
+
+  const product = products.find(p => p.slug === slug);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return <Navigate to="/shop" replace />;

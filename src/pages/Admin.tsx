@@ -1,12 +1,18 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit, X } from 'lucide-react';
-import { sampleProducts } from '@/lib/data';
+import { useQuery } from '@tanstack/react-query';
+import { fetcher } from '@/lib/api';
 import { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 const Admin: React.FC = () => {
-  const [products, setProducts] = useState(sampleProducts);
+  const { data: fetchedProducts = [], isLoading } = useQuery<Product[]>(
+    ['/api/products'],
+    () => fetcher<Product[]>('/api/products')
+  );
+
+  const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
@@ -18,6 +24,18 @@ const Admin: React.FC = () => {
     images: ['']
   });
   const { toast } = useToast();
+
+  useEffect(() => {
+    setProducts(fetchedProducts);
+  }, [fetchedProducts]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   const handleAddProduct = () => {
     setEditingProduct(null);
