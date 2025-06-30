@@ -35,6 +35,7 @@ model Order {
   userId    String
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  status    OrderStatus @default(PENDING)
   items     OrderItem[]
 }
 
@@ -46,4 +47,10 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
 }
