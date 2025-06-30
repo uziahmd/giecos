@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dev:api": "pnpm --filter ./api ts-node-dev src/index.ts",
+    "dev:api": "pnpm --filter ./api exec ts-node-dev src/index.ts",
     "prisma": "pnpm --filter ./api prisma"
   },
   "dependencies": {
