@@ -67,7 +67,7 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-playfair font-bold text-homeglow-primary mb-4">
-              Why Choose HomeGlow?
+              Why Choose GIECOS SOLUTION?
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We're committed to providing exceptional service and premium products for your home

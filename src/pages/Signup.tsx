@@ -32,7 +32,7 @@ const Signup: React.FC = () => {
       console.log('OTP verification:', otpValue);
       toast({
         title: "Account created successfully!",
-        description: "Welcome to HomeGlow.",
+          description: "Welcome to GIECOS SOLUTION.",
       });
     }
   };
@@ -53,7 +53,7 @@ const Signup: React.FC = () => {
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             {step === 'signup' 
-              ? 'Join HomeGlow and start shopping' 
+              ? 'Join GIECOS SOLUTION and start shopping'
               : 'Enter the 6-digit code sent to your email'}
           </p>
         </div>

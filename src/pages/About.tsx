@@ -6,7 +6,7 @@ const About: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-playfair font-bold text-homeglow-primary mb-8 text-center">
-          About HomeGlow
+          About GIECOS SOLUTION
         </h1>
 
         <div className="prose prose-gray max-w-none">
@@ -15,7 +15,7 @@ const About: React.FC = () => {
               Our Story
             </h2>
             <p className="text-gray-600 leading-relaxed mb-4">
-              Founded in 2020, HomeGlow began as a simple idea: to bring premium home appliances 
+              Founded in 2020, GIECOS SOLUTION began as a simple idea: to bring premium home appliances
               to every household. We believe that quality appliances shouldn't be a luxury, but 
               an accessible way to enhance your daily life.
             </p>
@@ -26,7 +26,7 @@ const About: React.FC = () => {
               create the home of your dreams.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              At HomeGlow, we're more than just a retailer – we're your partners in creating a 
+              At GIECOS SOLUTION, we're more than just a retailer – we're your partners in creating a
               home that truly glows with warmth, comfort, and modern convenience.
             </p>
           </div>

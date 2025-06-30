@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div>
             <h3 className="text-xl font-playfair font-bold text-homeglow-accent mb-4">
-              HomeGlow
+              GIECOS SOLUTION
             </h3>
             <p className="text-gray-300">
               Premium home appliances for modern living. Quality you can trust.
@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 HomeGlow. All rights reserved.</p>
+          <p>&copy; 2024 GIECOS SOLUTION. All rights reserved.</p>
         </div>
       </div>
     </footer>
