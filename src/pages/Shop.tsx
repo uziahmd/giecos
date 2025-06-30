@@ -2,8 +2,10 @@
 import React, { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { sampleProducts } from '@/lib/data';
 import { useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { Product } from '@/lib/types';
+import { fetcher } from '@/lib/api';
 
 const Shop: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -11,8 +13,13 @@ const Shop: React.FC = () => {
   const [filterInStock, setFilterInStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
+  const { data: products = [], isLoading } = useQuery<Product[]>(
+    ['/api/products'],
+    () => fetcher<Product[]>('/api/products')
+  );
+
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = sampleProducts;
+    let filtered = products;
 
     // Filter by search query
     if (searchQuery) {
@@ -41,7 +48,7 @@ const Shop: React.FC = () => {
     });
 
     return sorted;
-  }, [searchQuery, filterInStock, sortBy]);
+  }, [products, searchQuery, filterInStock, sortBy]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,16 +108,22 @@ const Shop: React.FC = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredAndSortedProducts.map(product => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredAndSortedProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-      {filteredAndSortedProducts.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No products found matching your criteria.</p>
-        </div>
+          {filteredAndSortedProducts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No products found matching your criteria.</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
