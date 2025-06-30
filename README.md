@@ -38,7 +38,7 @@ cp .env.sample api/.env
 npm run prisma migrate dev
 
 # seed the database
-pnpm --filter ./api exec ts-node prisma/seed.ts
+npm run seed
    ```
 
 ## Development
