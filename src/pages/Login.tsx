@@ -16,7 +16,7 @@ const Login: React.FC = () => {
     console.log('Login attempt:', formData);
     toast({
       title: "Login successful!",
-      description: "Welcome back to HomeGlow.",
+      description: "Welcome back to GIECOS SOLUTION.",
     });
   };
 
@@ -35,7 +35,7 @@ const Login: React.FC = () => {
             Welcome back
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to your HomeGlow account
+            Sign in to your GIECOS SOLUTION account
           </p>
         </div>
         

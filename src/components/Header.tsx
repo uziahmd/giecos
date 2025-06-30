@@ -15,7 +15,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="text-2xl font-playfair font-bold text-homeglow-primary">
-            HomeGlow
+            GIECOS SOLUTION
           </Link>
 
           {/* Navigation */}

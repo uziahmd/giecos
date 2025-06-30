@@ -1,5 +1,6 @@
 
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -53,7 +54,7 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// HomeGlow custom colors
+                                // GIECOS SOLUTION custom colors
 				'homeglow-bg': '#F8F5F2', // off-white background
 				'homeglow-primary': '#800020', // burgundy
 				'homeglow-accent': '#C73F40', // accent/hover
@@ -91,5 +92,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+        plugins: [animate],
 } satisfies Config;
