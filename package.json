@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:api": "pnpm --filter ./api exec ts-node-dev src/index.ts",
-    "prisma": "pnpm --filter ./api prisma"
+    "prisma": "pnpm --filter ./api run prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
