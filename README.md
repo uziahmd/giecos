@@ -158,8 +158,9 @@ Run common tasks from the project root:
   pnpm --filter ./api run test
   ```
 
-- **Playwright tests**:
+- **Playwright tests** (requires the frontend and API servers to be running):
   ```bash
+  pnpm exec playwright install
   pnpm run test:e2e
   ```
 
