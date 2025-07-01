@@ -72,6 +72,39 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     return { success: true }
   })
 
+  fastify.post(
+    '/otp/resend',
+    {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 hour',
+        },
+      },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const bodySchema = z.object({ email: z.string().email() })
+      const { email } = bodySchema.parse(request.body)
+
+      const user = await fastify.prisma.user.findUnique({ where: { email } })
+      if (!user || !user.otpHash || !user.otpExpiry) {
+        return reply.code(400).send({ error: 'Cannot resend code' })
+      }
+
+      const code = generateOtp()
+      const otpHash = await hashOtp(code)
+      const expiry = otpExpiry()
+
+      await fastify.prisma.user.update({
+        where: { id: user.id },
+        data: { otpHash, otpExpiry: expiry },
+      })
+
+      await sendOtpEmail(email, code)
+      return { success: true }
+    },
+  )
+
   fastify.post('/login', async (request: FastifyRequest, reply: FastifyReply) => {
     const bodySchema = z.object({
       email: z.string().email(),
