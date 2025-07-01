@@ -13,14 +13,16 @@
     "nanoid": "^5.1.5",
     "prisma": "^6.10.1",
     "resend": "^4.6.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "nodemailer": "^7.0.4"
   },
   "description": "",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^24.0.7",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "@types/nodemailer": "^6.4.17"
   },
   "keywords": [],
   "license": "ISC",
