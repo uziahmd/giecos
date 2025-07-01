@@ -31,14 +31,19 @@ describe('signup verify flow', () => {
 
     expect(sentCode).toMatch(/^\d{6}$/)
 
-    await request(app.server)
+    const verify = await request(app.server)
       .post('/api/otp/verify')
       .send({ email: 'test@example.com', code: sentCode })
       .expect(200)
 
+    const cookie = Array.isArray(verify.headers['set-cookie'])
+      ? verify.headers['set-cookie'][0]
+      : verify.headers['set-cookie']
+    const tokenCookie = cookie.split(';')[0]
+
     const me = await request(app.server)
       .get('/api/me')
-      .set('Cookie', signup.headers['set-cookie'])
+      .set('Cookie', tokenCookie)
       .expect(200)
 
     expect(me.body.email).toBe('test@example.com')

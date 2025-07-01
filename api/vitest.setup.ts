@@ -7,10 +7,10 @@ process.env.RESEND_API_KEY = 'test'
 process.env.RESEND_FROM = 'test@example.com'
 process.env.OTP_EXP_MINUTES = '15'
 
-if (fs.existsSync('api/prisma/test.db')) {
-  fs.rmSync('api/prisma/test.db')
+if (fs.existsSync('prisma/test.db')) {
+  fs.rmSync('prisma/test.db')
 }
-execSync('pnpm exec prisma migrate deploy --schema=api/prisma/schema.prisma', {
+execSync('pnpm exec prisma migrate deploy --schema=prisma/schema.prisma', {
   stdio: 'inherit',
   env: { ...process.env, DATABASE_URL: 'file:./test.db' },
 })
