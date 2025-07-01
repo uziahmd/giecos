@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { apiPost } from '@/lib/apiPost';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,15 +11,25 @@ const Login: React.FC = () => {
     password: ''
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login
-    console.log('Login attempt:', formData);
-    toast({
-      title: "Login successful!",
-      description: "Welcome back to GIECOS SOLUTION.",
-    });
+    try {
+      await apiPost('/api/login', formData);
+      const me = await fetch('/api/me', { credentials: 'include' });
+      if (me.ok) {
+        setUser(await me.json());
+      }
+      toast({
+        title: 'Login successful!',
+        description: 'Welcome back to GIECOS SOLUTION.',
+      });
+      navigate('/');
+    } catch (err) {
+      toast({ title: 'Login failed', description: (err as Error).message });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
