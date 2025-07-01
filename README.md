@@ -1,6 +1,7 @@
 # Giecos Solution
 
 A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and **Prisma**. The front‑end resides in the `src/` directory, and the backend API lives under `api/`. This starter kit is configured with TypeScript, Tailwind CSS, React Query, and Radix UI.
+Requires Node.js 18 or newer.
 
 ---
 
@@ -150,22 +151,27 @@ Run common tasks from the project root:
 | `pnpm prisma:studio` | Open Prisma Studio GUI        |
 
 ---
-
 ## ✅ Testing & Linting
 
-* **Linting**:
-
+- **API tests**:
   ```bash
+  pnpm --filter ./api run test
   ```
 
-pnpm run lint
+- **Playwright tests**:
+  ```bash
+  pnpm run test:e2e
+  ```
 
-````
+- **Linting**:
+  ```bash
+  pnpm run lint
+  ```
+
 - **Formatting**:
   ```bash
-pnpm run format
-````
-
+  pnpm run format
+  ```
 (Configure and run tests if added in the future.)
 
 ---
