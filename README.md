@@ -17,9 +17,11 @@ Requires Node.js 18 or newer.
 8. [Scripts](#scripts)
 9. [Testing & Linting](#testing--linting)
 10. [Manual Testing Checklist](#manual-testing-checklist)
-11. [Authentication Workflow](#authentication-workflow)
-12. [Building for Production](#building-for-production)
-13. [Project Structure](#project-structure)
+11. [API Endpoints](#api-endpoints)
+12. [Authentication Workflow](#authentication-workflow)
+13. [Checkout Flow](#checkout-flow)
+14. [Building for Production](#building-for-production)
+15. [Project Structure](#project-structure)
 
 ---
 
@@ -95,9 +97,9 @@ The backend uses the following variables:
 | `RESEND_API_KEY` | Credentials for the Resend email service |
 | `RESEND_FROM` | From address for sent emails |
 | `OTP_EXP_MINUTES` | Minutes before OTP codes expire |
-| `STRIPE_SECRET_KEY` | Private key for Stripe API |
+| `STRIPE_SECRET_KEY` | Secret key for Stripe server API |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
-| `FRONTEND_URL` | URL of the frontend application |
+| `FRONTEND_URL` | Frontend URL used in checkout redirects |
 
 ---
 
@@ -189,8 +191,24 @@ Run common tasks from the project root:
 5. **Cart**: Add, update, remove items; totals and localStorage update.
 6. **Authentication**: Signup/login flows and toasts display correctly.
 7. **Admin Dashboard**: In-memory add/edit/delete products.
+
 8. **Contact Form**: Submission logs message and shows toast.
 9. **404 Page**: Unknown routes show custom 404 message.
+
+---
+
+## 🔗 API Endpoints
+
+The backend exposes REST endpoints for managing products and initiating checkout.
+
+**Product Management**
+
+| Method & Path | Description | Auth |
+| --- | --- | --- |
+| `GET /api/products` | List all products | none |
+| `POST /api/products` | Create a product | admin |
+| `PATCH /api/products/:id` | Update a product | admin |
+| `DELETE /api/products/:id` | Remove a product | admin |
 
 ---
 
@@ -202,6 +220,20 @@ Run common tasks from the project root:
    and clears the temporary OTP fields.
 3. **Login** – a JWT token cookie is issued on successful credentials and used
    for authenticated requests via the `/api/me` endpoint.
+
+---
+
+## 🛒 Checkout Flow
+
+Stripe Checkout is used to collect payments.
+
+```
+Cart -> POST /api/checkout -> Stripe session
+     -> user pays
+Stripe -> POST /api/stripe/webhook -> order marked PAID -> receipt email
+```
+
+Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env` so success and cancel URLs work.
 
 ---
 
