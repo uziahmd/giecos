@@ -47,3 +47,12 @@ export function sendWelcomeEmail(email: string) {
     html,
   })
 }
+
+export function sendOrderReceipt(email: string) {
+  const html = `<p>Your payment has been received. Thank you for your order.</p>`
+  return sendMail({
+    to: email,
+    subject: 'Order receipt',
+    html,
+  })
+}
