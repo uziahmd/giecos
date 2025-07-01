@@ -42,9 +42,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     await sendOtpEmail(email, code)
 
-    const token = fastify.jwt.sign({ id: user.id })
-    reply.setCookie('token', token, cookieOptions)
-    return { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin }
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      isAdmin: user.isAdmin,
+    }
   })
 
   fastify.post('/otp/verify', async (request: FastifyRequest, reply: FastifyReply) => {
@@ -69,6 +72,8 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       data: { otpHash: null, otpExpiry: null },
     })
     await sendWelcomeEmail(email)
+    const token = fastify.jwt.sign({ id: user.id })
+    reply.setCookie('token', token, cookieOptions)
     return { success: true }
   })
 

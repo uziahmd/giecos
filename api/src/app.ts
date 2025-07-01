@@ -9,6 +9,12 @@ import prismaPlugin from './plugins/prisma'
 import productsRoutes from './routes/products'
 import authRoutes from './routes/auth'
 
+declare module 'fastify' {
+  interface FastifyInstance {
+    authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void>
+  }
+}
+
 export function buildApp() {
   const app = Fastify({ logger: true })
 
@@ -23,16 +29,10 @@ export function buildApp() {
   app.register(rateLimit, { global: false })
   app.register(prismaPlugin)
 
-  declare module 'fastify' {
-    interface FastifyInstance {
-      authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void>
-    }
-  }
-
   app.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
     try {
       const token = request.cookies.token
-      await request.jwtVerify({ token })
+      request.user = (this as typeof app).jwt.verify(token)
     } catch (err) {
       reply.code(401).send({ error: 'Unauthorized' })
     }
