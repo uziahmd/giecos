@@ -24,7 +24,7 @@
     "typescript": "^5.8.3",
     "@types/nodemailer": "^6.4.17",
     "vitest": "^1.4.0",
-    "supertest": "^6.4.2"
+    "supertest": "^7.1.1"
   },
   "keywords": [],
   "license": "ISC",
