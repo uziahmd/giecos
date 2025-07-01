@@ -48,8 +48,12 @@ export function sendWelcomeEmail(email: string) {
   })
 }
 
-export function sendOrderReceipt(email: string) {
-  const html = `<p>Your payment has been received. Thank you for your order.</p>`
+export function sendOrderReceipt(orderId: string, email: string, total: number) {
+  const html = `
+    <p>Thank you for your purchase!</p>
+    <p>Order ID: <strong>${orderId}</strong></p>
+    <p>Total: <strong>$${total.toFixed(2)}</strong></p>
+  `
   return sendMail({
     to: email,
     subject: 'Order receipt',

@@ -78,11 +78,15 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
       const order = await fastify.prisma.order.update({
         where: { stripeSessionId: session.id },
         data: { status: 'PAID' },
+        include: { items: true, user: true },
       })
-      const user = await fastify.prisma.user.findUnique({ where: { id: order.userId } })
-      if (user) {
-        await sendOrderReceipt(user.email)
-      }
+
+      const total = order.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      )
+
+      await sendOrderReceipt(order.id, order.user.email, total)
     }
 
     reply.send({ received: true })
