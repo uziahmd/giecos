@@ -4,8 +4,8 @@ This project is a full‑stack demo storefront built with **Vite**, **React**, *
 
 ## Prerequisites
 
-- **Node.js** 18 or newer
-- **npm** (comes with Node) and **pnpm** for the API workspace
+ - **Node.js** 18 or newer
+ - **pnpm** package manager
 
 Install pnpm globally if you don’t have it:
 
@@ -62,7 +62,7 @@ Navigate to `http://localhost:8080` in your browser to explore the storefront.
 ### Linting
 Run ESLint over the project with:
 ```bash
-npm run lint
+pnpm run lint
 ```
 
 ## Manual Testing Checklist
@@ -86,11 +86,11 @@ curl http://localhost:4000/api/products
 
 Create an optimized build of the front‑end:
 ```bash
-npm run build
+pnpm run build
 ```
 The output goes to `dist/`.  You can preview it locally using:
 ```bash
-npm run preview
+pnpm run preview
 ```
 
 ---
