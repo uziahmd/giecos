@@ -4,10 +4,29 @@ import { Link } from 'react-router-dom';
 import { Plus, Minus, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { getCartTotal } from '@/lib/cart';
+import { apiPost } from '@/lib/apiPost';
+import { useToast } from '@/hooks/use-toast';
 
 const Cart: React.FC = () => {
   const { items, removeFromCart, updateQuantity } = useCart();
   const total = getCartTotal(items);
+  const { toast } = useToast();
+
+  const handleCheckout = async () => {
+    try {
+      const session = await apiPost<{ url: string }>('/api/checkout', {
+        items: items.map((i) => ({ id: i.product.id, qty: i.quantity })),
+      });
+      if (session.url) {
+        window.location.href = session.url;
+      }
+    } catch (err) {
+      toast({
+        title: 'Checkout failed',
+        description: (err as Error).message,
+      });
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -101,7 +120,10 @@ const Cart: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full bg-homeglow-primary text-white py-3 rounded-md font-semibold hover:bg-homeglow-accent transition-colors mb-4">
+            <button
+              onClick={handleCheckout}
+              className="w-full bg-homeglow-primary text-white py-3 rounded-md font-semibold hover:bg-homeglow-accent transition-colors mb-4"
+            >
               Proceed to Checkout
             </button>
             
