@@ -1,33 +1,50 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Edit, X } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Navigate } from 'react-router-dom';
 import { fetcher } from '@/lib/api';
-import { Product } from '@/lib/types';
+import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import ProductModal from '@/components/ProductModal';
 
 const Admin: React.FC = () => {
-  const { data: fetchedProducts = [], isLoading } = useQuery<Product[]>(
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { data: products = [], isLoading } = useQuery<Product[]>(
     ['/api/products'],
     () => fetcher<Product[]>('/api/products')
   );
-
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    description: '',
-    category: '',
-    inStock: true,
-    images: ['']
-  });
   const { toast } = useToast();
 
-  useEffect(() => {
-    setProducts(fetchedProducts);
-  }, [fetchedProducts]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  if (!user) return <Navigate to="/login" replace />;
+  if (!user.isAdmin) return <Navigate to="/" replace />;
+
+  const handleAdd = () => {
+    setEditingProduct(null);
+    setModalOpen(true);
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/products/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (res.ok) {
+      toast({ title: 'Product deleted!' });
+      queryClient.invalidateQueries(['/api/products']);
+    } else {
+      toast({ title: 'Deletion failed', description: `${res.status}` });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -37,102 +54,6 @@ const Admin: React.FC = () => {
     );
   }
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setFormData({
-      name: '',
-      price: '',
-      description: '',
-      category: '',
-      inStock: true,
-      images: ['']
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      price: product.price.toString(),
-      description: product.description,
-      category: product.category,
-      inStock: product.inStock,
-      images: product.images
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (editingProduct) {
-      // Update existing product
-      const updatedProduct: Product = {
-        ...editingProduct,
-        name: formData.name,
-        price: parseFloat(formData.price),
-        description: formData.description,
-        category: formData.category,
-        inStock: formData.inStock,
-        images: formData.images.filter(img => img.trim() !== ''),
-        slug: formData.name.toLowerCase().replace(/\s+/g, '-')
-      };
-      
-      setProducts(products.map(p => p.id === editingProduct.id ? updatedProduct : p));
-      toast({
-        title: "Product updated!",
-        description: "The product has been successfully updated.",
-      });
-    } else {
-      // Add new product
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        name: formData.name,
-        price: parseFloat(formData.price),
-        description: formData.description,
-        category: formData.category,
-        inStock: formData.inStock,
-        images: formData.images.filter(img => img.trim() !== ''),
-        slug: formData.name.toLowerCase().replace(/\s+/g, '-')
-      };
-      
-      setProducts([...products, newProduct]);
-      toast({
-        title: "Product added!",
-        description: "The new product has been successfully added.",
-      });
-    }
-    
-    setIsModalOpen(false);
-  };
-
-  const handleDeleteProduct = (productId: string) => {
-    setProducts(products.filter(p => p.id !== productId));
-    toast({
-      title: "Product deleted!",
-      description: "The product has been removed from the catalog.",
-    });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    });
-  };
-
-  const handleImageChange = (index: number, value: string) => {
-    const newImages = [...formData.images];
-    newImages[index] = value;
-    setFormData({ ...formData, images: newImages });
-  };
-
-  const addImageField = () => {
-    setFormData({ ...formData, images: [...formData.images, ''] });
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
@@ -140,7 +61,7 @@ const Admin: React.FC = () => {
           Product Management
         </h1>
         <button
-          onClick={handleAddProduct}
+          onClick={handleAdd}
           className="bg-homeglow-primary text-white px-6 py-2 rounded-md font-semibold hover:bg-homeglow-accent transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -148,7 +69,6 @@ const Admin: React.FC = () => {
         </button>
       </div>
 
-      {/* Products Table */}
       <div className="bg-white rounded-md shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
@@ -193,23 +113,19 @@ const Admin: React.FC = () => {
                   {product.category}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    product.inStock 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 py-1 text-xs rounded-full ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {product.inStock ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button
-                    onClick={() => handleEditProduct(product)}
+                    onClick={() => handleEdit(product)}
                     className="text-homeglow-primary hover:text-homeglow-accent"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDeleteProduct(product.id)}
+                    onClick={() => handleDelete(product.id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <X className="w-4 h-4" />
@@ -221,135 +137,11 @@ const Admin: React.FC = () => {
         </table>
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsModalOpen(false)} />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-md shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">
-                  {editingProduct ? 'Edit Product' : 'Add New Product'}
-                </h2>
-                
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price
-                      </label>
-                      <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        step="0.01"
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Category
-                      </label>
-                      <input
-                        type="text"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      rows={3}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Images
-                    </label>
-                    {formData.images.map((image, index) => (
-                      <div key={index} className="mb-2">
-                        <input
-                          type="url"
-                          value={image}
-                          onChange={(e) => handleImageChange(index, e.target.value)}
-                          placeholder="Image URL"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
-                        />
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addImageField}
-                      className="text-homeglow-primary hover:text-homeglow-accent text-sm"
-                    >
-                      + Add another image
-                    </button>
-                  </div>
-
-                  <div>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        name="inStock"
-                        checked={formData.inStock}
-                        onChange={handleChange}
-                        className="mr-2"
-                      />
-                      In Stock
-                    </label>
-                  </div>
-
-                  <div className="flex gap-4 pt-4">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-homeglow-primary text-white py-2 px-4 rounded-md font-semibold hover:bg-homeglow-accent transition-colors"
-                    >
-                      {editingProduct ? 'Update Product' : 'Add Product'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsModalOpen(false)}
-                      className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md font-semibold hover:bg-gray-400 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <ProductModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        product={editingProduct}
+      />
     </div>
   );
 };
