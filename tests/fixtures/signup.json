@@ -1,0 +1,7 @@
+{
+  "id": "1",
+  "email": "test@example.com",
+  "name": "E2E User",
+  "isAdmin": false,
+  "otp": "123456"
+}
