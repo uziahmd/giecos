@@ -2,6 +2,7 @@ import Fastify, { FastifyRequest, FastifyReply } from 'fastify'
 import cors from '@fastify/cors'
 import cookie from '@fastify/cookie'
 import jwt from '@fastify/jwt'
+import rateLimit from '@fastify/rate-limit'
 
 import { PORT, JWT_SECRET } from './env'
 import prismaPlugin from './plugins/prisma'
@@ -18,6 +19,7 @@ app.register(cookie)
 if (JWT_SECRET) {
   app.register(jwt, { secret: JWT_SECRET })
 }
+app.register(rateLimit, { global: false })
 app.register(prismaPlugin)
 
 declare module 'fastify' {
