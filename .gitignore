@@ -24,5 +24,6 @@ dist-ssr
 *.sln
 *.sw?
 api/prisma/dev.db
+api/prisma/test.db
 .env
 api/.env
