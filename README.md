@@ -1,97 +1,208 @@
 # Giecos Solution
 
-This project is a full‑stack demo storefront built with **Vite**, **React**, **Fastify** and **Prisma**.  The front‑end lives in the root `src` directory while the API is located in [`api/`](api/).  The app is configured for TypeScript, TailwindCSS, React Query and Radix UI components.
+A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and **Prisma**. The front‑end resides in the `src/` directory, and the backend API lives under `api/`. This starter kit is configured with TypeScript, Tailwind CSS, React Query, and Radix UI.
 
-## Prerequisites
+---
 
- - **Node.js** 18 or newer
- - **pnpm** package manager
+## 📋 Table of Contents
 
-Install pnpm globally if you don’t have it:
+1. [Features](#features)
+2. [Prerequisites](#prerequisites)
+3. [Installation](#installation)
+4. [Configuration](#configuration)
+5. [Database Setup](#database-setup)
+6. [Development](#development)
+7. [Scripts](#scripts)
+8. [Testing & Linting](#testing--linting)
+9. [Manual Testing Checklist](#manual-testing-checklist)
+10. [Building for Production](#building-for-production)
+11. [Project Structure](#project-structure)
+
+---
+
+## 🚀 Features
+
+* **Product Catalog**: Browse, search, filter, and sort products.
+* **Product Details**: View detailed information and add to cart.
+* **Shopping Cart**: Add, update, and remove items with real-time totals and persistent storage.
+* **Authentication**: Email signup/login with JWT-based protection.
+* **Admin Dashboard**: In-memory CRUD for products.
+* **Contact Form**: Sends inquiries via API endpoint with confirmation toasts.
+* **Responsive Design**: Optimized for desktop, tablet, and mobile.
+
+---
+
+## 🔧 Prerequisites
+
+* **Node.js** v18 or newer
+* **pnpm** package manager
+
+Install `pnpm` globally if needed:
 
 ```bash
 npm install -g pnpm
 ```
 
-## Setup
+---
 
-1. **Clone the repository**
-   ```bash
-git clone <repo-url> && cd giecos
-   ```
-2. **Install root dependencies**
-   ```bash
-   pnpm install
-   ```
-3. **Install API dependencies**
-   ```bash
-   pnpm --filter ./api install
-   ```
-4. **Create environment variables**
-   Copy `.env.sample` to `api/.env` and adjust values as needed.  At minimum set `DATABASE_URL`, `JWT_SECRET`, and `PORT`.
-   ```bash
-   cp .env.sample api/.env
-   ```
-5. **Run database migrations** and seed sample data:
-   ```bash
-   # apply migrations
-   pnpm prisma migrate dev
+## 🛠 Installation
 
-   # seed the database
-   pnpm run seed
+1. **Clone the repo**
+
+   ```bash
    ```
 
-## Development
+git clone <repo-url> giecos && cd giecos
 
-Open two terminals:
+````
+2. **Install dependencies**
+```bash
+pnpm install
+pnpm --filter ./api install
+````
 
-1. **Start the API**
+---
+
+## ⚙️ Configuration
+
+1. Copy the environment sample:
+
    ```bash
-   pnpm dev:api
    ```
-   The server listens on `http://localhost:4000` and exposes endpoints under `/api`.
+
+cp .env.sample api/.env
+
+````
+2. Edit `api/.env` and set the following variables:
+   - `DATABASE_URL` (e.g., `postgresql://user:pass@localhost:5432/dbname`)
+   - `JWT_SECRET` (a strong random string)
+   - `PORT` (API port, e.g., `4000`)
+
+---
+
+## 🗄 Database Setup
+
+Run migrations and seed data:
+
+```bash
+pnpm prisma migrate dev    # Apply or create migrations
+pnpm run seed             # Populate sample data
+````
+
+---
+
+## 👩‍💻 Development
+
+Open two terminal sessions:
+
+1. **Start the backend API**
+
+   ```bash
+   ```
+
+pnpm dev\:api
+
+````
+   - Server runs at `http://localhost:4000` under `/api`.
 
 2. **Start the front‑end**
    ```bash
-   pnpm dev
-   ```
-   Vite serves the React app on `http://localhost:8080` and proxies API requests to the backend.
+pnpm dev
+````
 
-Navigate to `http://localhost:8080` in your browser to explore the storefront.
+* Vite dev server at `http://localhost:8080`, proxies `/api` requests.
 
-### Linting
-Run ESLint over the project with:
-```bash
+Visit `http://localhost:8080` to view the app.
+
+---
+
+## 📜 Scripts
+
+Run common tasks from the project root:
+
+| Command              | Description                   |
+| -------------------- | ----------------------------- |
+| `pnpm dev`           | Start Vite frontend server    |
+| `pnpm dev:api`       | Start Fastify backend server  |
+| `pnpm run build`     | Build frontend for production |
+| `pnpm run preview`   | Preview production build      |
+| `pnpm run lint`      | Run ESLint                    |
+| `pnpm run format`    | Format code with Prettier     |
+| `pnpm prisma:studio` | Open Prisma Studio GUI        |
+
+---
+
+## ✅ Testing & Linting
+
+* **Linting**:
+
+  ```bash
+  ```
+
 pnpm run lint
-```
 
-## Manual Testing Checklist
+````
+- **Formatting**:
+  ```bash
+pnpm run format
+````
 
-After the servers are running you can verify features end‑to‑end:
+(Configure and run tests if added in the future.)
 
-1. **API** – Request the product list to ensure the database works:
+---
+
+## 🧪 Manual Testing Checklist
+
+1. **API**: `curl http://localhost:4000/api/products` returns product list.
+2. **Home Page**: Promo banner, trending section, featured collections load.
+3. **Shop Page**: Products display; filtering, search, sorting work.
+4. **Product Detail**: `/product/:slug` shows details; cart addition works.
+5. **Cart**: Add, update, remove items; totals and localStorage update.
+6. **Authentication**: Signup/login flows and toasts display correctly.
+7. **Admin Dashboard**: In-memory add/edit/delete products.
+8. **Contact Form**: Submission logs message and shows toast.
+9. **404 Page**: Unknown routes show custom 404 message.
+
+---
+
+## 📦 Building for Production
+
+1. **Build frontend**:
+
    ```bash
-curl http://localhost:4000/api/products
    ```
-2. **Home page** – Loads promo banner, trending section and featured collections.
-3. **Shop page** – Displays products from the API. Test filtering, search and sort.
-4. **Product detail** – Accessible via `/product/:slug`. Add items to the cart from this page.
-5. **Cart** – Adding, updating and removing items should update totals and local storage.
-6. **Login / Signup** – Submit forms and observe toast notifications.
-7. **Admin page** – Add, edit and delete products in-memory.
-8. **Contact form** – Submitting should log the message and show a toast.
-9. **Not Found** – Navigating to an unknown route should show the 404 page.
 
-## Building for Production
-
-Create an optimized build of the front‑end:
-```bash
 pnpm run build
-```
-The output goes to `dist/`.  You can preview it locally using:
-```bash
+
+````
+2. **Preview build**:
+   ```bash
 pnpm run preview
+````
+
+The optimized assets output to `dist/`.
+
+---
+
+## 📂 Project Structure
+
+```
+/ (repo root)
+├─ api/                # Fastify + Prisma backend
+│  ├─ src/             # Source code (routes, plugins, env)
+│  ├─ prisma/          # Schema and migrations
+│  └─ .env             # Environment variables
+├─ src/                # React frontend
+│  ├─ components/      # UI components (Radix + custom)
+│  ├─ pages/           # Route-based pages
+│  ├─ styles/          # Tailwind CSS configs and globals
+│  └─ main.tsx         # React entrypoint
+├─ public/             # Static assets
+├─ package.json        # Workspace & scripts
+├─ pnpm-workspace.yaml # Monorepo filters
+└─ tailwind.config.ts  # Tailwind customization
 ```
 
 ---
-This guide covers the current implementation of the project.  Future features may require additional setup.
+
+*Last updated: July 1, 2025*
