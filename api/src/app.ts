@@ -6,6 +6,7 @@ import rateLimit from '@fastify/rate-limit'
 
 import { JWT_SECRET } from './env'
 import prismaPlugin from './plugins/prisma'
+import rolesPlugin from './plugins/roles'
 import productsRoutes from './routes/products'
 import authRoutes from './routes/auth'
 
@@ -25,6 +26,7 @@ export function buildApp() {
   app.register(cookie)
   if (JWT_SECRET) {
     app.register(jwt, { secret: JWT_SECRET })
+    app.register(rolesPlugin)
   }
   app.register(rateLimit, { global: false })
   app.register(prismaPlugin)
