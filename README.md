@@ -10,13 +10,15 @@ A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and 
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
 4. [Configuration](#configuration)
-5. [Database Setup](#database-setup)
-6. [Development](#development)
-7. [Scripts](#scripts)
-8. [Testing & Linting](#testing--linting)
-9. [Manual Testing Checklist](#manual-testing-checklist)
-10. [Building for Production](#building-for-production)
-11. [Project Structure](#project-structure)
+5. [Environment Variables](#environment-variables)
+6. [Database Setup](#database-setup)
+7. [Development](#development)
+8. [Scripts](#scripts)
+9. [Testing & Linting](#testing--linting)
+10. [Manual Testing Checklist](#manual-testing-checklist)
+11. [Authentication Workflow](#authentication-workflow)
+12. [Building for Production](#building-for-production)
+13. [Project Structure](#project-structure)
 
 ---
 
@@ -80,6 +82,21 @@ cp .env.sample api/.env
 
 ---
 
+## 🗝 Environment Variables
+
+The backend uses the following variables:
+
+| Variable | Description |
+| --- | --- |
+| `DATABASE_URL` | Database connection string |
+| `JWT_SECRET` | Secret for signing JWTs |
+| `PORT` | API server port (defaults to `4000`) |
+| `RESEND_API_KEY` | Credentials for the Resend email service |
+| `RESEND_FROM` | From address for sent emails |
+| `OTP_EXP_MINUTES` | Minutes before OTP codes expire |
+
+---
+
 ## 🗄 Database Setup
 
 Run migrations and seed data:
@@ -88,6 +105,8 @@ Run migrations and seed data:
 pnpm prisma migrate dev    # Apply or create migrations
 pnpm run seed             # Populate sample data
 ````
+If you pull new migrations from version control, run `pnpm prisma migrate dev`
+again to update your local database.
 
 ---
 
@@ -162,6 +181,17 @@ pnpm run format
 7. **Admin Dashboard**: In-memory add/edit/delete products.
 8. **Contact Form**: Submission logs message and shows toast.
 9. **404 Page**: Unknown routes show custom 404 message.
+
+---
+
+## 🔐 Authentication Workflow
+
+1. **Signup** – users register with name, email, and password. An OTP code is
+   emailed for verification.
+2. **Verify OTP** – posting the code to `/api/otp/verify` confirms the account
+   and clears the temporary OTP fields.
+3. **Login** – a JWT token cookie is issued on successful credentials and used
+   for authenticated requests via the `/api/me` endpoint.
 
 ---
 
