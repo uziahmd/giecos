@@ -22,7 +22,7 @@ model Product {
   name        String
   price       Float
   description String
-  images      String[]
+  images      Json @default("[]")
   inStock     Boolean     @default(true)
   category    String
   slug        String      @unique
