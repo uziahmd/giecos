@@ -65,7 +65,7 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post('/stripe/webhook', async (request: FastifyRequest, reply: FastifyReply) => {
     const sig = request.headers['stripe-signature'] as string
-    const rawBody = (request as any).rawBody as Buffer
+    const rawBody = (request as FastifyRequest & { rawBody: Buffer }).rawBody
     let event: Stripe.Event
     try {
       event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET as string)
