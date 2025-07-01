@@ -73,7 +73,7 @@ pnpm --filter ./api install
    ```bash
    ```
 
-cp .env.sample api/.env
+cp .env.example api/.env
 
 ````
 2. Edit `api/.env` and set the following variables:
@@ -95,6 +95,9 @@ The backend uses the following variables:
 | `RESEND_API_KEY` | Credentials for the Resend email service |
 | `RESEND_FROM` | From address for sent emails |
 | `OTP_EXP_MINUTES` | Minutes before OTP codes expire |
+| `STRIPE_SECRET_KEY` | Private key for Stripe API |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `FRONTEND_URL` | URL of the frontend application |
 
 ---
 
