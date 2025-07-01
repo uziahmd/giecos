@@ -91,6 +91,23 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
 
     reply.send({ received: true })
   })
+
+  fastify.get('/orders/latest', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const userId = (request.user as { id: string }).id
+    const order = await fastify.prisma.order.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true },
+    })
+
+    if (!order) {
+      reply.code(404)
+      return { error: 'No orders found' }
+    }
+
+    const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    return { id: order.id, items: order.items, total }
+  })
 }
 
 export default checkoutRoutes
