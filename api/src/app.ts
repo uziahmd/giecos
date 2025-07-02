@@ -40,9 +40,13 @@ export function buildApp() {
   })
   app.register(prismaPlugin)
 
-  app.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
+  app.decorate('authenticate', async function (
+    request: FastifyRequest,
+    reply: FastifyReply,
+  ) {
     try {
       const token = request.cookies.token
+      if (!token) throw new Error('Missing token')
       request.user = (this as typeof app).jwt.verify(token)
     } catch (err) {
       reply.code(401).send({ error: 'Unauthorized' })
