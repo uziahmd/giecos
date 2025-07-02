@@ -114,7 +114,7 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.code(400).send({ error: 'Invalid signature' })
       }
 
-      const event = JSON.parse(raw) as { type: string; data: any }
+      const event = JSON.parse(raw) as { type: string; data: { id: string } }
       if (event.type === 'payment_intent.succeeded') {
         const intent = event.data
         const order = await fastify.prisma.order.update({

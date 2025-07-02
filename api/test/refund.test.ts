@@ -8,7 +8,9 @@ vi.mock('../src/lib/airwallex', () => ({
 }))
 
 beforeAll(() => {
-  global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as any
+  global.fetch = vi
+    .fn()
+    .mockResolvedValue({ ok: true, json: async () => ({}) }) as unknown as typeof fetch
 })
 
 let app: ReturnType<typeof buildApp>

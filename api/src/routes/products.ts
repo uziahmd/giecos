@@ -17,7 +17,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
     '/upload',
     { preHandler: upload.single('image') },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const file = (request as any).file as Express.Multer.File | undefined
+      const file = (request as FastifyRequest & { file?: Express.Multer.File }).file
       if (!file) {
         reply.code(400)
         return { error: 'No file uploaded' }
