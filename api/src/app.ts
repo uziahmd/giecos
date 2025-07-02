@@ -5,7 +5,7 @@ import jwt from '@fastify/jwt'
 import rateLimit from '@fastify/rate-limit'
 import rawBody from '@fastify/raw-body'
 
-import { JWT_SECRET } from './env'
+import { JWT_SECRET, FRONTEND_URL } from './env'
 import prismaPlugin from './plugins/prisma'
 import rolesPlugin from './plugins/roles'
 import productsRoutes from './routes/products'
@@ -22,7 +22,7 @@ export function buildApp() {
   const app = Fastify({ logger: true })
 
   app.register(cors, {
-    origin: 'http://localhost:8080',
+    origin: FRONTEND_URL,
     credentials: true,
   })
   app.register(cookie)
