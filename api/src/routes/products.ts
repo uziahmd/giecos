@@ -27,6 +27,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         __dirname,
         '..',
         '..',
+        '..',
         IMG_BASE.replace(/^\//, ''),
         name,
       )
