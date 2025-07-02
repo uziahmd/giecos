@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { X, Plus, Minus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { getCartTotal } from '@/lib/cart';
@@ -8,6 +8,15 @@ import { getCartTotal } from '@/lib/cart';
 const CartDrawer: React.FC = () => {
   const { items, removeFromCart, updateQuantity, isDrawerOpen, setIsDrawerOpen } = useCart();
   const total = getCartTotal(items);
+  const location = useLocation();
+  const prevPath = React.useRef(location.pathname);
+
+  useEffect(() => {
+    if (location.pathname !== prevPath.current) {
+      setIsDrawerOpen(false);
+    }
+    prevPath.current = location.pathname;
+  }, [location.pathname, setIsDrawerOpen]);
 
   if (!isDrawerOpen) return null;
 
@@ -96,9 +105,13 @@ const CartDrawer: React.FC = () => {
                   >
                     View Cart
                   </Link>
-                  <button className="w-full bg-homeglow-primary text-white py-2 rounded-md hover:bg-homeglow-accent transition-colors">
+                  <Link
+                    to="/cart"
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="block w-full bg-homeglow-primary text-white py-2 rounded-md hover:bg-homeglow-accent transition-colors text-center"
+                  >
                     Checkout
-                  </button>
+                  </Link>
                 </div>
               </div>
             </>
