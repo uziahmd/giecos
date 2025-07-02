@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { PORT, IMG_BASE } from './env'
 import { buildApp } from './app'
-import fastifyStatic from 'fastify-static'
+import fastifyStatic from '@fastify/static'
 
 const app = buildApp()
 app.register(fastifyStatic, {
