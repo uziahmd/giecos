@@ -216,6 +216,9 @@ importers:
       vite:
         specifier: ^7.0.0
         version: 7.0.0(@types/node@22.15.34)(jiti@2.4.2)(yaml@2.8.0)
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
 
   api:
     dependencies:
