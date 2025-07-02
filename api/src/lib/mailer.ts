@@ -8,7 +8,7 @@ const devTransporter = nodemailer.createTransport({
   jsonTransport: true,
 })
 
-async function sendMail(options: {
+export async function sendMail(options: {
   to: string
   subject: string
   html: string
