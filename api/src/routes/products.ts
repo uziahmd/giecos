@@ -3,6 +3,7 @@ import { z } from 'zod'
 import multer from 'fastify-multer'
 import sharp from 'sharp'
 import { join } from 'path'
+import { IMG_BASE } from '../env'
 
 const productsRoutes: FastifyPluginAsync = async (fastify) => {
   const upload = multer({ storage: multer.memoryStorage() })
@@ -22,9 +23,15 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         return { error: 'No file uploaded' }
       }
       const name = `${Date.now()}_${file.originalname}.jpg`
-      const filepath = join(__dirname, '../../uploads', name)
+      const filepath = join(
+        __dirname,
+        '..',
+        '..',
+        IMG_BASE.replace(/^\//, ''),
+        name,
+      )
       await sharp(file.buffer).resize(800).jpeg().toFile(filepath)
-      return { url: `/uploads/${name}` }
+      return { url: `${IMG_BASE}/${name}` }
     },
   )
 
