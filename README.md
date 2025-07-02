@@ -160,9 +160,15 @@ Run common tasks from the project root:
 ## ✅ Testing & Linting
 
 - **API tests**:
+  The API test suite needs a few environment variables. Copy the sample file and
+  then run the tests:
   ```bash
+  cp api/.env.test.example api/.env
   pnpm --filter ./api run test
   ```
+  Required variables include `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`,
+  `RESEND_FROM`, `OTP_EXP_MINUTES`, `STRIPE_SECRET_KEY`,
+  `STRIPE_WEBHOOK_SECRET`, and `FRONTEND_URL`.
 
 - **Playwright tests** (requires the frontend and API servers to be running):
   ```bash
