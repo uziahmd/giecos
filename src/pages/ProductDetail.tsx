@@ -59,6 +59,7 @@ const ProductDetail: React.FC = () => {
             <img
               src={product.images[selectedImage]}
               alt={product.name}
+              loading="lazy"
               className="w-full h-full object-cover"
             />
           </div>
@@ -75,6 +76,7 @@ const ProductDetail: React.FC = () => {
                   <img
                     src={image}
                     alt={`${product.name} ${index + 1}`}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 </button>

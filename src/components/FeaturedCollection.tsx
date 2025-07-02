@@ -38,6 +38,7 @@ const FeaturedCollection: React.FC = () => {
                   <img
                     src={collection.image}
                     alt={collection.title}
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-40 group-hover:bg-opacity-30 transition-opacity duration-300" />
