@@ -6,6 +6,7 @@ process.env.JWT_SECRET = 'testsecret'
 process.env.RESEND_API_KEY = 'test'
 process.env.RESEND_FROM = 'test@example.com'
 process.env.OTP_EXP_MINUTES = '15'
+process.env.FRONTEND_URL = 'http://localhost:8080'
 
 if (fs.existsSync('prisma/test.db')) {
   fs.rmSync('prisma/test.db')
