@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { useSearchParams } from 'react-router-dom';
@@ -60,7 +61,15 @@ const Shop: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>Catalog - GIECOS SOLUTION</title>
+        <meta
+          name="description"
+          content="Browse our selection of premium appliances."
+        />
+      </Helmet>
+      <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-playfair font-bold text-homeglow-primary mb-4">
           Shop Premium Appliances
@@ -126,6 +135,7 @@ const Shop: React.FC = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 
