@@ -23,5 +23,7 @@ jobs:
         run: pnpm exec vite build
       - name: Setup env
         run: cp .env.example api/.env
+      - name: Generate Prisma client
+        run: pnpm --filter ./api exec prisma generate
       - name: Run Lighthouse CI
         run: pnpm exec lhci autorun
