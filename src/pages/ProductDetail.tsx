@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Navigate } from 'react-router-dom';
 import { Plus, Minus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -45,7 +46,12 @@ const ProductDetail: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>{`${product.name} - GIECOS SOLUTION`}</title>
+        <meta name="description" content={product.description} />
+      </Helmet>
+      <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Image Gallery */}
         <div>
@@ -148,6 +154,7 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
