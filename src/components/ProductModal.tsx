@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -37,10 +37,33 @@ const defaultValues: FormValues = {
 const ProductModal: React.FC<ProductModalProps> = ({ open, onOpenChange, product }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
   const { register, control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues,
   });
   const { fields, append, remove } = useFieldArray({ control, name: 'images' });
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+    setUploading(true);
+    try {
+      const res = await fetch('/api/products/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        append({ value: data.url });
+      } else {
+        toast({ title: 'Upload failed', description: `${res.status}` });
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -117,6 +140,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onOpenChange, product
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+            <input type="file" onChange={handleFile} className="mb-2" />
+            {uploading && <span className="text-sm">Uploading...</span>}
             {fields.map((field, index) => (
               <div key={field.id} className="flex items-center mb-2 gap-2">
                 <Input type="url" placeholder="Image URL" {...register(`images.${index}.value` as const)} />

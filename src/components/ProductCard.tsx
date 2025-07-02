@@ -8,9 +8,12 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const prefetch = () => {
+    fetch(`/product/${product.slug}`).catch(() => {})
+  }
   return (
     <div className="bg-white rounded-md shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
-      <Link to={`/product/${product.slug}`}>
+      <Link to={`/product/${product.slug}`} onMouseEnter={prefetch}>
         <div className="aspect-square overflow-hidden">
           <img
             src={product.images[0]}

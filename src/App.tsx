@@ -2,7 +2,8 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -27,7 +28,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const location = useLocation();
+  return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -38,7 +41,8 @@ const App = () => (
           <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-1">
-            <Routes>
+            <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Home />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:slug" element={<ProductDetail />} />
@@ -53,6 +57,7 @@ const App = () => (
               <Route path="/account/orders" element={<Orders />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </AnimatePresence>
           </main>
           <Footer />
           <CartDrawer />
@@ -62,6 +67,7 @@ const App = () => (
     </AuthProvider>
   </QueryClientProvider>
   </HelmetProvider>
-);
+  )
+}
 
 export default App;

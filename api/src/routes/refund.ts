@@ -1,0 +1,42 @@
+import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
+import { z } from 'zod'
+import stripe from '../lib/stripe'
+
+const refundRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.post(
+    '/api/orders/:id/refund',
+    { preHandler: [fastify.authenticate, fastify.requireAdmin] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const paramsSchema = z.object({ id: z.string() })
+      const { id } = paramsSchema.parse(request.params)
+
+      const order = await fastify.prisma.order.findUnique({
+        where: { id },
+        include: { items: true },
+      })
+
+      if (!order || order.status !== 'PAID' || !order.stripeSessionId) {
+        reply.code(400)
+        return { error: 'Order not refundable' }
+      }
+
+      await fastify.prisma.$transaction(async (tx) => {
+        const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId!)
+        if (session.payment_intent) {
+          await stripe.refunds.create({ payment_intent: session.payment_intent as string })
+        }
+        for (const item of order.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          })
+        }
+        await tx.order.update({ where: { id }, data: { status: 'REFUNDED' } })
+      })
+
+      return { status: 'ok' }
+    },
+  )
+}
+
+export default refundRoutes

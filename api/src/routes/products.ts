@@ -1,10 +1,32 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
+import multer from 'fastify-multer'
+import sharp from 'sharp'
+import { join } from 'path'
 
 const productsRoutes: FastifyPluginAsync = async (fastify) => {
+  const upload = multer({ storage: multer.memoryStorage() })
+  fastify.register(multer.contentParser)
+
   fastify.get('/', async () => {
     return fastify.prisma.product.findMany()
   })
+
+  fastify.post(
+    '/upload',
+    { preHandler: upload.single('image') },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const file = (request as any).file as Express.Multer.File | undefined
+      if (!file) {
+        reply.code(400)
+        return { error: 'No file uploaded' }
+      }
+      const name = `${Date.now()}_${file.originalname}.jpg`
+      const filepath = join(__dirname, '../../uploads', name)
+      await sharp(file.buffer).resize(800).jpeg().toFile(filepath)
+      return { url: `/uploads/${name}` }
+    },
+  )
 
   fastify.post(
     '/',

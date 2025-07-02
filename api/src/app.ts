@@ -4,6 +4,7 @@ import cookie from '@fastify/cookie'
 import jwt from '@fastify/jwt'
 import rateLimit from '@fastify/rate-limit'
 import rawBody from 'fastify-raw-body'
+import multipart from '@fastify/multipart'
 
 import { JWT_SECRET, FRONTEND_URL } from './env'
 import prismaPlugin from './plugins/prisma'
@@ -12,6 +13,7 @@ import productsRoutes from './routes/products'
 import authRoutes from './routes/auth'
 import checkoutRoutes from './routes/checkout'
 import ordersRoutes from './routes/orders'
+import refundRoutes from './routes/refund'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -32,6 +34,7 @@ export function buildApp() {
     app.register(rolesPlugin)
   }
   app.register(rateLimit, { global: false })
+  app.register(multipart)
   app.register(rawBody, {
     field: 'rawBody',
     global: false,
@@ -57,6 +60,7 @@ export function buildApp() {
   app.register(authRoutes, { prefix: '/api' })
   app.register(checkoutRoutes, { prefix: '/api' })
   app.register(ordersRoutes, { prefix: '/api' })
+  app.register(refundRoutes)
 
   return app
 }
