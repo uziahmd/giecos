@@ -34,7 +34,14 @@ describe('product and checkout flow', () => {
     const res = await request(app.server)
       .post('/api/products')
       .set('Cookie', `token=${token}`)
-      .send({ name: 'Test', price: 1, description: 'd', category: 'c', slug: 'test-admin' })
+      .send({
+        name: 'Test',
+        price: 1,
+        description: 'd',
+        category: 'c',
+        slug: 'test-admin',
+        stock: 5,
+      })
       .expect(201)
 
     expect(res.body.id).toBeDefined()
@@ -45,7 +52,14 @@ describe('product and checkout flow', () => {
     await request(app.server)
       .post('/api/products')
       .set('Cookie', `token=${token}`)
-      .send({ name: 'Fail', price: 1, description: 'd', category: 'c', slug: 'test-guest' })
+      .send({
+        name: 'Fail',
+        price: 1,
+        description: 'd',
+        category: 'c',
+        slug: 'test-guest',
+        stock: 5,
+      })
       .expect(403)
   })
 
