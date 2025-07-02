@@ -119,6 +119,11 @@ The backend uses the following variables:
 | `FRONTEND_URL` | Frontend URL used in checkout redirects |
 | `SITE_URL` | Canonical domain for the frontend |
 
+Create an Airwallex account and open the **Developer** dashboard. Generate a
+client ID and API key under **API Keys** and copy the webhook signing secret from
+the **Webhooks** section. Use these test credentials in your `.env` file when
+running locally.
+
 ---
 
 ## 🗄 Database Setup
@@ -131,11 +136,6 @@ pnpm run seed             # Populate sample data
 ````
 If you pull new migrations from version control, run `pnpm prisma migrate dev`
 again to update your local database.
-
-Before deploying the `20250702112848_rename_stripe_to_paymentintent` migration,
-ensure the `Order` table has no duplicate `stripeSessionId` values so they can
-be safely renamed to `paymentIntentId`. Remove or merge any duplicates before
-running `pnpm prisma migrate deploy`.
 
 ---
 
@@ -262,7 +262,7 @@ Cart -> POST /api/checkout -> Airwallex intent
 Airwallex -> POST /api/airwallex/webhook -> order marked PAID -> receipt email
 ```
 
-Set `AIRWALLEX_CLIENT_ID`, `AIRWALLEX_API_KEY`, `AIRWALLEX_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env`.
+Set `AIRWALLEX_CLIENT_ID`, `AIRWALLEX_API_KEY`, `AIRWALLEX_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env`. Configure a webhook in your Airwallex dashboard for `payment_intent.succeeded` events pointing to `/api/airwallex/webhook`.
 
 ---
 
