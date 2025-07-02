@@ -43,6 +43,10 @@ export function buildApp() {
   app.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
     try {
       const token = request.cookies.token
+      if (!token) {
+        reply.code(401).send({ error: 'Unauthorized' })
+        return
+      }
       request.user = (this as typeof app).jwt.verify(token)
     } catch (err) {
       reply.code(401).send({ error: 'Unauthorized' })
