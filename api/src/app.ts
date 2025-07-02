@@ -11,6 +11,7 @@ import rolesPlugin from './plugins/roles'
 import productsRoutes from './routes/products'
 import authRoutes from './routes/auth'
 import checkoutRoutes from './routes/checkout'
+import ordersRoutes from './routes/orders'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -51,6 +52,7 @@ export function buildApp() {
   app.register(productsRoutes, { prefix: '/api/products' })
   app.register(authRoutes, { prefix: '/api' })
   app.register(checkoutRoutes, { prefix: '/api' })
+  app.register(ordersRoutes, { prefix: '/api' })
 
   return app
 }
