@@ -66,6 +66,10 @@ git clone <repo-url> giecos && cd giecos
 pnpm install
 pnpm --filter ./api install
 ````
+3. **Generate Prisma client**
+```bash
+pnpm --filter ./api exec prisma generate
+````
 
 ---
 
