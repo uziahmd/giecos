@@ -31,24 +31,39 @@ const refundRoutes: FastifyPluginAsync = async (fastify) => {
         return { error: 'Order not refundable' }
       }
 
-      await fastify.prisma.$transaction(async (tx) => {
-        const token = await getAirwallexToken()
-        await fetch('https://api.airwallex.com/api/v1/pa/refunds/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ payment_intent_id: order.paymentIntentId }),
-        })
-        for (const item of order.items) {
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: { increment: item.quantity } },
+      try {
+        await fastify.prisma.$transaction(async (tx) => {
+          const token = await getAirwallexToken()
+          const resp = await fetch('https://api.airwallex.com/api/v1/pa/refunds/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ payment_intent_id: order.paymentIntentId }),
           })
-        }
-        await tx.order.update({ where: { id }, data: { status: 'REFUNDED' } })
-      })
+          if (!resp.ok) {
+            let errText: string
+            try {
+              const data = await resp.json()
+              errText = data?.message ?? JSON.stringify(data)
+            } catch {
+              errText = await resp.text()
+            }
+            throw new Error(`Refund failed: ${errText}`)
+          }
+          for (const item of order.items) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { increment: item.quantity } },
+            })
+          }
+          await tx.order.update({ where: { id }, data: { status: 'REFUNDED' } })
+        })
+      } catch (err) {
+        reply.code(400)
+        return { error: (err as Error).message }
+      }
 
       return { status: 'ok' }
     },
