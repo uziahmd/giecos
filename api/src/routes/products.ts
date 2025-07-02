@@ -48,6 +48,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         inStock: z.boolean().optional(),
         category: z.string(),
         slug: z.string(),
+        stock: z.number(),
       })
 
       const parsed = bodySchema.safeParse(request.body)
@@ -55,8 +56,29 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
         return reply.code(400).send({ error: msg })
       }
-      const data = parsed.data
-      const product = await fastify.prisma.product.create({ data })
+      const {
+        name,
+        price,
+        description,
+        images,
+        inStock,
+        category,
+        slug,
+        stock,
+      } = parsed.data
+
+      const product = await fastify.prisma.product.create({
+        data: {
+          name,
+          price,
+          description,
+          images,
+          inStock,
+          category,
+          slug,
+          stock,
+        },
+      })
       reply.code(201)
       return product
     },
@@ -76,6 +98,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
           inStock: z.boolean().optional(),
           category: z.string().optional(),
           slug: z.string().optional(),
+          stock: z.number().optional(),
         })
         .refine((data) => Object.keys(data).length > 0, {
           message: 'No fields to update',
@@ -92,10 +115,28 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.code(400).send({ error: msg })
       }
       const { id } = paramsParsed.data
-      const data = bodyParsed.data
+      const {
+        name,
+        price,
+        description,
+        images,
+        inStock,
+        category,
+        slug,
+        stock,
+      } = bodyParsed.data
       const product = await fastify.prisma.product.update({
         where: { id },
-        data,
+        data: {
+          name,
+          price,
+          description,
+          images,
+          inStock,
+          category,
+          slug,
+          stock,
+        },
       })
       return product
     },
