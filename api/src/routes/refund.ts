@@ -14,7 +14,12 @@ const refundRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       const paramsSchema = z.object({ id: z.string() })
-      const { id } = paramsSchema.parse(request.params)
+      const parsed = paramsSchema.safeParse(request.params)
+      if (!parsed.success) {
+        const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const { id } = parsed.data
 
       const order = await fastify.prisma.order.findUnique({
         where: { id },

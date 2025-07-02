@@ -13,7 +13,12 @@ const ordersRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.get('/orders/:id', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
     const paramsSchema = z.object({ id: z.string() })
-    const { id } = paramsSchema.parse(request.params)
+    const parsed = paramsSchema.safeParse(request.params)
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      return reply.code(400).send({ error: msg })
+    }
+    const { id } = parsed.data
     const userId = (request.user as { id: string }).id
 
     const order = await fastify.prisma.order.findFirst({
@@ -31,7 +36,12 @@ const ordersRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post('/orders/:id/cancel', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
     const paramsSchema = z.object({ id: z.string() })
-    const { id } = paramsSchema.parse(request.params)
+    const parsed = paramsSchema.safeParse(request.params)
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      return reply.code(400).send({ error: msg })
+    }
+    const { id } = parsed.data
     const userId = (request.user as { id: string }).id
 
     const order = await fastify.prisma.order.findFirst({

@@ -24,7 +24,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       email: z.string().email(),
       password: z.string(),
     })
-    const { name, email, password } = bodySchema.parse(request.body)
+    const parsed = bodySchema.safeParse(request.body)
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      return reply.code(400).send({ error: msg })
+    }
+    const { name, email, password } = parsed.data
 
     const existing = await fastify.prisma.user.findUnique({ where: { email } })
     if (existing) {
@@ -55,7 +60,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       email: z.string().email(),
       code: z.string(),
     })
-    const { email, code } = bodySchema.parse(request.body)
+    const parsed = bodySchema.safeParse(request.body)
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      return reply.code(400).send({ error: msg })
+    }
+    const { email, code } = parsed.data
 
     const user = await fastify.prisma.user.findUnique({ where: { email } })
     if (!user || !user.otpHash || !user.otpExpiry) {
@@ -89,7 +99,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const bodySchema = z.object({ email: z.string().email() })
-      const { email } = bodySchema.parse(request.body)
+      const parsed = bodySchema.safeParse(request.body)
+      if (!parsed.success) {
+        const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const { email } = parsed.data
 
       const user = await fastify.prisma.user.findUnique({ where: { email } })
       if (!user || !user.otpHash || !user.otpExpiry) {
@@ -115,7 +130,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       email: z.string().email(),
       password: z.string(),
     })
-    const { email, password } = bodySchema.parse(request.body)
+    const parsed = bodySchema.safeParse(request.body)
+    if (!parsed.success) {
+      const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      return reply.code(400).send({ error: msg })
+    }
+    const { email, password } = parsed.data
 
     const user = await fastify.prisma.user.findUnique({ where: { email } })
     if (!user) {
