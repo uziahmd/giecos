@@ -1,7 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
-import stripe from '../lib/stripe'
 import { ALLOW_REFUNDS } from '../env'
+import { getAirwallexToken } from '../lib/airwallex'
 
 const refundRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post(
@@ -26,16 +26,21 @@ const refundRoutes: FastifyPluginAsync = async (fastify) => {
         include: { items: true },
       })
 
-      if (!order || order.status !== 'PAID' || !order.stripeSessionId) {
+      if (!order || order.status !== 'PAID' || !order.paymentIntentId) {
         reply.code(400)
         return { error: 'Order not refundable' }
       }
 
       await fastify.prisma.$transaction(async (tx) => {
-        const session = await stripe.checkout.sessions.retrieve(order.stripeSessionId!)
-        if (session.payment_intent) {
-          await stripe.refunds.create({ payment_intent: session.payment_intent as string })
-        }
+        const token = await getAirwallexToken()
+        await fetch('https://api.airwallex.com/api/v1/pa/refunds/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ payment_intent_id: order.paymentIntentId }),
+        })
         for (const item of order.items) {
           await tx.product.update({
             where: { id: item.productId },

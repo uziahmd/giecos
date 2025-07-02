@@ -1,9 +1,9 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
-import stripe from '../lib/stripe'
-import { FRONTEND_URL, STRIPE_WEBHOOK_SECRET } from '../env'
+import { AIRWALLEX_WEBHOOK_SECRET } from '../env'
+import { createHmac } from 'node:crypto'
+import { getAirwallexToken } from '../lib/airwallex'
 import { sendOrderReceipt } from '../lib/mailer'
-import Stripe from 'stripe'
 
 const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/checkout', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -25,7 +25,7 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
     const productIds = items.map((i) => i.id)
     const userId = (request.user as { id: string }).id
 
-    let session: Stripe.Checkout.Session | null = null
+    let paymentIntent: { id: string; client_secret: string } | null = null
 
     try {
       await fastify.prisma.$transaction(async (tx) => {
@@ -47,31 +47,35 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
           }
         }
 
-        const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
-        for (const item of items) {
-          const product = products.find((p) => p.id === item.id)!
-          lineItems.push({
-            price_data: {
-              currency: 'usd',
-              unit_amount: Math.round(product.price * 100),
-              product_data: { name: product.name },
+        const token = await getAirwallexToken()
+        const total = items.reduce((sum, it) => {
+          const p = products.find((pp) => pp.id === it.id)!
+          return sum + p.price * it.qty
+        }, 0)
+        const resp = await fetch(
+          'https://api.airwallex.com/api/v1/pa/payment_intents/create',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
             },
-            quantity: item.qty,
-          })
+            body: JSON.stringify({
+              amount: Math.round(total * 100),
+              currency: 'USD',
+            }),
+          },
+        )
+        if (!resp.ok) throw new Error('Failed creating payment intent')
+        paymentIntent = (await resp.json()) as {
+          id: string
+          client_secret: string
         }
-
-        session = await stripe.checkout.sessions.create({
-          mode: 'payment',
-          payment_method_types: ['card'],
-          line_items: lineItems,
-          success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${FRONTEND_URL}/cart`,
-        })
 
         await tx.order.create({
           data: {
             userId,
-            stripeSessionId: session.id,
+            paymentIntentId: paymentIntent.id,
             status: 'PENDING',
             items: {
               create: items.map((it) => {
@@ -92,42 +96,44 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     reply.code(200)
-    return { url: session!.url }
+    return { id: paymentIntent!.id, client_secret: paymentIntent!.client_secret }
   })
 
   fastify.post(
-    '/stripe/webhook',
+    '/airwallex/webhook',
     {
       config: { rawBody: true },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const sig = request.headers['stripe-signature'] as string
-      const rawBody = (request as FastifyRequest & { rawBody: Buffer }).rawBody
-      let event: Stripe.Event
-      try {
-        event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET as string)
-      } catch (err) {
+      const sig = request.headers['awx-signature'] as string
+      const raw = (request as FastifyRequest & { rawBody: string }).rawBody
+      const hmac = createHmac('sha256', AIRWALLEX_WEBHOOK_SECRET as string)
+        .update(raw)
+        .digest('hex')
+      if (sig !== hmac) {
         return reply.code(400).send({ error: 'Invalid signature' })
       }
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session
-      const order = await fastify.prisma.order.update({
-        where: { stripeSessionId: session.id },
-        data: { status: 'PAID' },
-        include: { items: true, user: true },
-      })
+      const event = JSON.parse(raw) as { type: string; data: any }
+      if (event.type === 'payment_intent.succeeded') {
+        const intent = event.data
+        const order = await fastify.prisma.order.update({
+          where: { paymentIntentId: intent.id },
+          data: { status: 'PAID' },
+          include: { items: true, user: true },
+        })
+        const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        await sendOrderReceipt(order.id, order.user.email, total)
+      } else if (event.type === 'payment_intent.failed') {
+        await fastify.prisma.order.update({
+          where: { paymentIntentId: event.data.id },
+          data: { status: 'CANCELLED' },
+        })
+      }
 
-      const total = order.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      )
-
-      await sendOrderReceipt(order.id, order.user.email, total)
-    }
-
-    reply.send({ received: true })
-  })
+      reply.send({ received: true })
+    },
+  )
 
   fastify.get('/orders/latest', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
     const userId = (request.user as { id: string }).id

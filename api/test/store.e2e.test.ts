@@ -1,20 +1,18 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { createHmac } from 'node:crypto'
 import request from 'supertest'
 import { buildApp } from '../src/app'
 
 let app: ReturnType<typeof buildApp>
-var checkoutCreate: vi.Mock
-var constructEvent: vi.Mock
+let fetchMock: vi.Mock
 
-vi.mock('../src/lib/stripe', () => {
-  checkoutCreate = vi.fn().mockResolvedValue({ id: 'sess_checkout', url: 'https://example.com/c' })
-  constructEvent = vi.fn()
-  return {
-    default: {
-      checkout: { sessions: { create: checkoutCreate } },
-      webhooks: { constructEvent },
-    },
-  }
+vi.mock('../src/lib/airwallex', () => ({
+  getAirwallexToken: vi.fn().mockResolvedValue('tok'),
+}))
+
+beforeAll(() => {
+  fetchMock = vi.fn()
+  global.fetch = fetchMock as any
 })
 
 vi.mock('../src/lib/mailer', () => ({
@@ -58,11 +56,11 @@ describe('product and checkout flow', () => {
     })
     const token = app.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
 
-    checkoutCreate.mockResolvedValueOnce({ id: 'sess_checkout', url: 'https://example.com/c' })
-    constructEvent.mockReturnValueOnce({
-      type: 'checkout.session.completed',
-      data: { object: { id: 'sess_checkout' } },
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: 'pi_1', client_secret: 'secret' }),
     })
+    const webhookBody = JSON.stringify({ type: 'payment_intent.succeeded', data: { id: 'pi_1' } })
 
     const res = await request(app.server)
       .post('/api/checkout')
@@ -70,16 +68,16 @@ describe('product and checkout flow', () => {
       .send({ items: [{ id: product.id, qty: 1 }] })
       .expect(200)
 
-    expect(res.body.url).toBe('https://example.com/c')
+    expect(res.body.id).toBe('pi_1')
 
     await request(app.server)
-      .post('/api/stripe/webhook')
-      .set('stripe-signature', 'test')
+      .post('/api/airwallex/webhook')
+      .set('awx-signature', createHmac('sha256', 'whsec_test').update(webhookBody).digest('hex'))
       .set('Content-Type', 'application/json')
-      .send('{}')
+      .send(webhookBody)
       .expect(200)
 
-    const order = await app.prisma.order.findFirst({ where: { stripeSessionId: 'sess_checkout' } })
+    const order = await app.prisma.order.findFirst({ where: { paymentIntentId: 'pi_1' } })
     expect(order?.status).toBe('PAID')
   })
 
