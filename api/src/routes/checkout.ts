@@ -13,64 +13,76 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
 
     const { items } = bodySchema.parse(request.body)
     const productIds = items.map((i) => i.id)
-
-    const products = await fastify.prisma.product.findMany({
-      where: { id: { in: productIds } },
-    })
-
-    for (const item of items) {
-      const product = products.find((p) => p.id === item.id)
-      if (!product || product.stock < item.qty) {
-        reply.code(400)
-        return {
-          error: `Insufficient stock for ${product ? product.name : 'item'}`,
-        }
-      }
-    }
-
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
-    for (const item of items) {
-      const product = products.find((p) => p.id === item.id)
-      if (!product) continue
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          unit_amount: Math.round(product.price * 100),
-          product_data: { name: product.name },
-        },
-        quantity: item.qty,
-      })
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${FRONTEND_URL}/cart`,
-    })
-
     const userId = (request.user as { id: string }).id
-    await fastify.prisma.order.create({
-      data: {
-        userId,
-        stripeSessionId: session.id,
-        status: 'PENDING',
-        items: {
-          create: items.map((it) => {
-            const product = products.find((p) => p.id === it.id)!
-            return {
-              productId: it.id,
-              quantity: it.qty,
-              price: product.price,
-            }
-          }),
-        },
-      },
-    })
+
+    let session: Stripe.Checkout.Session | null = null
+
+    try {
+      await fastify.prisma.$transaction(async (tx) => {
+        const products = await tx.product.findMany({
+          where: { id: { in: productIds } },
+        })
+
+        for (const item of items) {
+          const product = products.find((p) => p.id === item.id)
+          if (!product) {
+            throw new Error('Product not found')
+          }
+          const updated = await tx.product.updateMany({
+            where: { id: item.id, stock: { gte: item.qty } },
+            data: { stock: { decrement: item.qty } },
+          })
+          if (updated.count === 0) {
+            throw new Error(`Insufficient stock for ${product.name}`)
+          }
+        }
+
+        const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = []
+        for (const item of items) {
+          const product = products.find((p) => p.id === item.id)!
+          lineItems.push({
+            price_data: {
+              currency: 'usd',
+              unit_amount: Math.round(product.price * 100),
+              product_data: { name: product.name },
+            },
+            quantity: item.qty,
+          })
+        }
+
+        session = await stripe.checkout.sessions.create({
+          mode: 'payment',
+          payment_method_types: ['card'],
+          line_items: lineItems,
+          success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${FRONTEND_URL}/cart`,
+        })
+
+        await tx.order.create({
+          data: {
+            userId,
+            stripeSessionId: session.id,
+            status: 'PENDING',
+            items: {
+              create: items.map((it) => {
+                const product = products.find((p) => p.id === it.id)!
+                return {
+                  productId: it.id,
+                  quantity: it.qty,
+                  price: product.price,
+                }
+              }),
+            },
+          },
+        })
+      })
+    } catch (err) {
+      reply.code(400)
+      return { error: (err as Error).message }
+    }
 
     reply.code(200)
-    return { url: session.url }
+    return { url: session!.url }
   })
 
   fastify.post(
@@ -90,26 +102,10 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
-      const order = await fastify.prisma.$transaction(async (tx) => {
-        const order = await tx.order.update({
-          where: { stripeSessionId: session.id },
-          data: { status: 'PAID' },
-          include: { items: { include: { product: true } }, user: true },
-        })
-
-        for (const item of order.items) {
-          const newStock = item.product.stock - item.quantity
-          if (newStock < 0) {
-            fastify.log.warn(
-              `Product ${item.product.name} stock would be negative`,
-            )
-          }
-          await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: newStock < 0 ? 0 : newStock },
-          })
-        }
-        return order
+      const order = await fastify.prisma.order.update({
+        where: { stripeSessionId: session.id },
+        data: { status: 'PAID' },
+        include: { items: true, user: true },
       })
 
       const total = order.items.reduce(
