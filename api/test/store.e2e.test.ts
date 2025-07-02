@@ -3,8 +3,8 @@ import request from 'supertest'
 import { buildApp } from '../src/app'
 
 let app: ReturnType<typeof buildApp>
-let checkoutCreate: vi.Mock
-let constructEvent: vi.Mock
+var checkoutCreate: vi.Mock
+var constructEvent: vi.Mock
 
 vi.mock('../src/lib/stripe', () => {
   checkoutCreate = vi.fn().mockResolvedValue({ id: 'sess_checkout', url: 'https://example.com/c' })
@@ -43,7 +43,7 @@ describe('product and checkout flow', () => {
   })
 
   it('returns 403 for non admin', async () => {
-    const token = app.jwt.sign({ id: 'user' })
+    const token = app.jwt.sign({ id: 'user', isAdmin: false })
     await request(app.server)
       .post('/api/products')
       .set('Cookie', `token=${token}`)
@@ -56,7 +56,7 @@ describe('product and checkout flow', () => {
     const product = await app.prisma.product.create({
       data: { name: 'Item', price: 2, description: 'd', category: 'c', slug: 'item', images: [] },
     })
-    const token = app.jwt.sign({ id: user.id })
+    const token = app.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
 
     checkoutCreate.mockResolvedValueOnce({ id: 'sess_checkout', url: 'https://example.com/c' })
     constructEvent.mockReturnValueOnce({
