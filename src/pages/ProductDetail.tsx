@@ -35,7 +35,7 @@ const ProductDetail: React.FC = () => {
   }
 
   const handleAddToCart = () => {
-    if (product.inStock) {
+    if (product.stock > 0) {
       addToCart(product, quantity);
       toast({
         title: "Added to cart!",
@@ -87,12 +87,14 @@ const ProductDetail: React.FC = () => {
             <span className="text-3xl font-bold text-homeglow-primary">
               ${product.price.toFixed(2)}
             </span>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              product.inStock 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {product.inStock ? 'In Stock' : 'Out of Stock'}
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                product.stock > 0
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
 
@@ -123,14 +125,14 @@ const ProductDetail: React.FC = () => {
           {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
-            disabled={!product.inStock}
+            disabled={product.stock === 0}
             className={`w-full py-3 px-6 rounded-md font-semibold transition-colors ${
-              product.inStock
+              product.stock > 0
                 ? 'bg-homeglow-primary text-white hover:bg-homeglow-accent'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+            {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
 
           {/* Product Features */}

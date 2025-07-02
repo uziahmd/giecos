@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test'
 test('admin adds product and shopper purchases it', async ({ page }) => {
   const adminEmail = 'admin@example.com'
   const shopperEmail = 'shopper@example.com'
-  const products: any[] = []
+  const products: Array<Record<string, unknown>> = []
   let currentUser: { email: string; isAdmin: boolean } | null = null
   const inbox: string[] = []
 
