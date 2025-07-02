@@ -21,4 +21,18 @@ describe('upload image', () => {
       .expect(200)
     expect(res.body.url).toContain('/uploads/')
   })
+
+  it('rejects unsupported type', async () => {
+    await request(app.server)
+      .post('/api/products/upload')
+      .attach('image', Buffer.from('test'), 'bad.txt')
+      .expect(400)
+  })
+
+  it('rejects large file', async () => {
+    await request(app.server)
+      .post('/api/products/upload')
+      .attach('image', Buffer.alloc(6 * 1024 * 1024), 'big.png')
+      .expect(400)
+  })
 })

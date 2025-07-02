@@ -5,6 +5,14 @@ import sharp from 'sharp'
 import { join } from 'path'
 import { IMG_BASE } from '../env'
 
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+]
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
 const productsRoutes: FastifyPluginAsync = async (fastify) => {
   const upload = multer({ storage: multer.memoryStorage() })
   fastify.register(multer.contentParser)
@@ -21,6 +29,14 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
       if (!file) {
         reply.code(400)
         return { error: 'No file uploaded' }
+      }
+      if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+        reply.code(400)
+        return { error: 'Invalid file type' }
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        reply.code(400)
+        return { error: 'File too large' }
       }
       const name = `${Date.now()}_${file.originalname}.jpg`
       const filepath = join(
