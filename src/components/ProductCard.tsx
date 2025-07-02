@@ -1,7 +1,6 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Product } from '@/lib/types';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Product } from "@/lib/types";
 
 interface ProductCardProps {
   product: Product;
@@ -9,8 +8,8 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const prefetch = () => {
-    fetch(`/product/${product.slug}`).catch(() => {})
-  }
+    fetch(`/product/${product.slug}`).catch(() => {});
+  };
   return (
     <div className="bg-white rounded-md shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
       <Link to={`/product/${product.slug}`} onMouseEnter={prefetch}>
@@ -33,11 +32,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span
               className={`px-2 py-1 text-xs rounded-full ${
                 product.stock > 0
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-red-100 text-red-800'
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
               }`}
             >
-              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+              In Stock: {product.stock}
             </span>
           </div>
         </div>
