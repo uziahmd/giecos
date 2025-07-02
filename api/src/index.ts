@@ -5,7 +5,7 @@ import fastifyStatic from 'fastify-static'
 
 const app = buildApp()
 app.register(fastifyStatic, {
-  root: join(__dirname, '..', IMG_BASE.replace(/^\//, '')),
+  root: join(__dirname, '..', '..', IMG_BASE.replace(/^\//, '')),
   prefix: IMG_BASE,
 })
 
