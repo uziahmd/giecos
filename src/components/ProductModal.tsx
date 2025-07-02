@@ -22,6 +22,7 @@ interface FormValues {
   description: string;
   category: string;
   inStock: boolean;
+  stock: number;
   images: { value: string }[];
 }
 
@@ -31,6 +32,7 @@ const defaultValues: FormValues = {
   description: '',
   category: '',
   inStock: true,
+  stock: 0,
   images: [{ value: '' }],
 };
 
@@ -83,6 +85,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onOpenChange, product
         description: product.description,
         category: product.category,
         inStock: product.inStock,
+        stock: product.stock,
         images: product.images.map((img) => ({ value: img })),
       });
     } else {
@@ -97,6 +100,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onOpenChange, product
       description: values.description,
       category: values.category,
       inStock: values.inStock,
+      stock: Number(values.stock),
       images: values.images.map((i) => i.value).filter(Boolean),
       slug: values.name.toLowerCase().replace(/\s+/g, '-'),
     };
@@ -159,6 +163,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onOpenChange, product
                 <span className="text-destructive text-sm">{errors.category.message}</span>
               )}
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Stock</label>
+            <Input type="number" min={0} {...register('stock', { valueAsNumber: true })} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
