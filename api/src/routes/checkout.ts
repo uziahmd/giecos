@@ -63,15 +63,20 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
     return { url: session.url }
   })
 
-  fastify.post('/stripe/webhook', async (request: FastifyRequest, reply: FastifyReply) => {
-    const sig = request.headers['stripe-signature'] as string
-    const rawBody = (request as FastifyRequest & { rawBody: Buffer }).rawBody
-    let event: Stripe.Event
-    try {
-      event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET as string)
-    } catch (err) {
-      return reply.code(400).send({ error: 'Invalid signature' })
-    }
+  fastify.post(
+    '/stripe/webhook',
+    {
+      config: { rawBody: true },
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const sig = request.headers['stripe-signature'] as string
+      const rawBody = (request as FastifyRequest & { rawBody: Buffer }).rawBody
+      let event: Stripe.Event
+      try {
+        event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET as string)
+      } catch (err) {
+        return reply.code(400).send({ error: 'Invalid signature' })
+      }
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
