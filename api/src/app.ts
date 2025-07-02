@@ -14,6 +14,7 @@ import authRoutes from './routes/auth'
 import checkoutRoutes from './routes/checkout'
 import ordersRoutes from './routes/orders'
 import refundRoutes from './routes/refund'
+import contactRoutes from './routes/contact'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -61,6 +62,7 @@ export function buildApp() {
   app.register(checkoutRoutes, { prefix: '/api' })
   app.register(ordersRoutes, { prefix: '/api' })
   app.register(refundRoutes)
+  app.register(contactRoutes, { prefix: '/api' })
 
   return app
 }

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { apiPost } from '@/lib/apiPost';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,15 +12,18 @@ const Contact: React.FC = () => {
   });
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    console.log('Contact form submitted:', formData);
-    toast({
-      title: "Thanks for your message!",
-      description: "We'll get back to you within 24 hours.",
-    });
-    setFormData({ name: '', email: '', message: '' });
+    try {
+      await apiPost('/api/contact', formData);
+      toast({
+        title: 'Thanks for your message!',
+        description: "We'll get back to you within 24 hours.",
+      });
+      setFormData({ name: '', email: '', message: '' });
+    } catch (err) {
+      toast({ title: 'Failed to send message', description: (err as Error).message });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
