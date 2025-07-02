@@ -1,6 +1,6 @@
 # Giecos Solution
 
-A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and **Prisma**. The front‑end resides in the `src/` directory, and the backend API lives under `api/`. This starter kit is configured with TypeScript, Tailwind CSS, React Query, and Radix UI.
+A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and **Prisma**. The front‑end resides in the `src/` directory, and the backend API lives under `api/`. This starter kit is configured with TypeScript, Tailwind CSS, React Query, and Radix UI and integrates **Airwallex** for payment processing.
 It relies on **React Query** for fetching and caching server data across the application.
 Requires Node.js 20 or newer.
 
@@ -36,6 +36,7 @@ Requires Node.js 20 or newer.
 * **Product Catalog**: Browse, search, filter, and sort products.
 * **Product Details**: View detailed information and add to cart.
 * **Shopping Cart**: Add, update, and remove items with real-time totals and persistent storage.
+* **Airwallex Payments**: Secure checkout using Airwallex payment intents.
 * **Authentication**: Email signup/login with JWT-based protection.
 * **Admin Dashboard**: Manage products with image uploads and issue refunds.
 * **Contact Form**: Sends inquiries via API endpoint with confirmation toasts.
