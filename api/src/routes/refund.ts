@@ -1,12 +1,18 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import stripe from '../lib/stripe'
+import { ALLOW_REFUNDS } from '../env'
 
 const refundRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post(
     '/api/orders/:id/refund',
     { preHandler: [fastify.authenticate, fastify.requireAdmin] },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      if (!ALLOW_REFUNDS) {
+        reply.code(403)
+        return { error: 'Refunds disabled' }
+      }
+
       const paramsSchema = z.object({ id: z.string() })
       const { id } = paramsSchema.parse(request.params)
 
