@@ -33,7 +33,7 @@ describe('latest order endpoint', () => {
       },
     })
 
-    const token = app.jwt.sign({ id: user.id })
+    const token = app.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
     const res = await request(app.server)
       .get('/api/orders/latest')
       .set('Cookie', `token=${token}`)

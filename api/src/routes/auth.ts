@@ -72,7 +72,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       data: { otpHash: null, otpExpiry: null },
     })
     await sendWelcomeEmail(email)
-    const token = fastify.jwt.sign({ id: user.id })
+    const token = fastify.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
     reply.setCookie('token', token, cookieOptions)
     return { success: true }
   })
@@ -127,7 +127,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(401).send({ error: 'Invalid email or password' })
     }
 
-    const token = fastify.jwt.sign({ id: user.id })
+    const token = fastify.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
     reply.setCookie('token', token, cookieOptions)
     return { id: user.id, email: user.email, name: user.name, isAdmin: user.isAdmin }
   })
