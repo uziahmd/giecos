@@ -3,7 +3,7 @@ import cors from '@fastify/cors'
 import cookie from '@fastify/cookie'
 import jwt from '@fastify/jwt'
 import rateLimit from '@fastify/rate-limit'
-import rawBody from '@fastify/raw-body'
+import rawBody from 'fastify-raw-body'
 
 import { JWT_SECRET, FRONTEND_URL } from './env'
 import prismaPlugin from './plugins/prisma'
