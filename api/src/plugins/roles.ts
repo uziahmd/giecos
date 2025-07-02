@@ -24,7 +24,7 @@ const rolesPlugin: FastifyPluginAsync = async (fastify) => {
     'requireAdmin',
     async function (request: FastifyRequest, reply: FastifyReply) {
       if (!fastify.isAdmin(request)) {
-        reply.code(403).send({ error: 'Forbidden' })
+        return reply.code(403).send({ error: 'Forbidden' })
       }
     },
   )
