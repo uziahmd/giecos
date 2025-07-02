@@ -21,7 +21,7 @@ beforeAll(async () => {
   await app.listen({ port: 0 })
   const user = await app.prisma.user.create({ data: { email: 'a', password: 'x', isAdmin: true } })
   const product = await app.prisma.product.create({ data: { name: 'p', price: 1, description: 'd', category: 'c', slug: 's', images: [] } })
-  await app.prisma.order.create({ data: { id: 'o1', userId: user.id, status: 'PAID', paymentIntentId: 'pi_1', items: { create: { productId: product.id, quantity: 1, price: 1 } } } })
+  await app.prisma.order.create({ data: { id: 'o1', userId: user.id, status: 'PAID', paymentIntentId: 'pi_refund_1', items: { create: { productId: product.id, quantity: 1, price: 1 } } } })
   token = app.jwt.sign({ id: user.id, isAdmin: true })
 })
 
