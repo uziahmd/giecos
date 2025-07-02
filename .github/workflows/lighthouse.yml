@@ -21,5 +21,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build frontend
         run: pnpm exec vite build
+      - name: Setup env
+        run: cp .env.example api/.env
       - name: Run Lighthouse CI
         run: pnpm exec lhci autorun
