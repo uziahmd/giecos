@@ -1,9 +1,12 @@
 
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -25,11 +28,22 @@ import VerifyOtp from "@/pages/VerifyOtp";
 import Admin from "@/pages/Admin";
 import Orders from "@/pages/Orders";
 import NotFound from "./pages/NotFound";
+import PageTransition from "@/components/PageTransition";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const location = useLocation();
+  useEffect(() => {
+    NProgress.configure({ showSpinner: false });
+  }, []);
+
+  useEffect(() => {
+    NProgress.done();
+    return () => {
+      NProgress.start();
+    };
+  }, [location.pathname]);
   return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
@@ -37,32 +51,30 @@ const App = () => {
         <CartProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
           <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-1">
             <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/product/:slug" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/success" element={<Success />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/verify-otp" element={<VerifyOtp />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/account/orders" element={<Orders />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+              <Route path="/shop" element={<PageTransition><Shop /></PageTransition>} />
+              <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
+              <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
+              <Route path="/success" element={<PageTransition><Success /></PageTransition>} />
+              <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+              <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
+              <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+              <Route path="/signup" element={<PageTransition><Signup /></PageTransition>} />
+              <Route path="/verify-otp" element={<PageTransition><VerifyOtp /></PageTransition>} />
+              <Route path="/admin" element={<PageTransition><Admin /></PageTransition>} />
+              <Route path="/account/orders" element={<PageTransition><Orders /></PageTransition>} />
+              <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
             </AnimatePresence>
           </main>
           <Footer />
           <CartDrawer />
         </div>
-        </BrowserRouter>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
