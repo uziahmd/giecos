@@ -21,8 +21,11 @@ Requires Node.js 20 or newer.
 11. [API Endpoints](#api-endpoints)
 12. [Authentication Workflow](#authentication-workflow)
 13. [Checkout Flow](#checkout-flow)
-14. [Building for Production](#building-for-production)
-15. [Project Structure](#project-structure)
+14. [Order History](#order-history)
+15. [Sitemap Generation](#sitemap-generation)
+16. [Lighthouse CI](#lighthouse-ci)
+17. [Building for Production](#building-for-production)
+18. [Project Structure](#project-structure)
 
 ---
 
@@ -77,17 +80,22 @@ pnpm --filter ./api exec prisma generate
 
 1. Copy the environment sample:
 
-   ```bash
-   ```
-
+```bash
 cp .env.example api/.env
-
-````
-2. Edit `api/.env` and set the following variables:
-   - `DATABASE_URL` (e.g., `postgresql://user:pass@localhost:5432/dbname`)
-   - `JWT_SECRET` (a strong random string)
-   - `PORT` (API port, e.g., `4000`)
-
+```
+2. Edit `api/.env` and set values similar to:
+```env
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="your-secret"
+PORT="4000"
+RESEND_API_KEY="your-resend-api-key"
+RESEND_FROM="noreply@example.com"
+OTP_EXP_MINUTES="15"
+STRIPE_SECRET_KEY="your-stripe-secret"
+STRIPE_WEBHOOK_SECRET="whsec_example"
+FRONTEND_URL="http://localhost:5173"
+SITE_URL="http://localhost:5173"
+```
 ---
 
 ## 🗝 Environment Variables
@@ -105,6 +113,7 @@ The backend uses the following variables:
 | `STRIPE_SECRET_KEY` | Secret key for Stripe server API |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
 | `FRONTEND_URL` | Frontend URL used in checkout redirects |
+| `SITE_URL` | Canonical domain for the frontend |
 
 ---
 
@@ -249,6 +258,24 @@ Stripe -> POST /api/stripe/webhook -> order marked PAID -> receipt email
 ```
 
 Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env` so success and cancel URLs work.
+
+---
+
+## 📜 Order History
+
+After completing a purchase the `/success` page fetches your most recent order via `/api/orders/latest`. A full list of previous orders is available at `/account/orders` and through the `/api/orders` endpoint.
+
+---
+
+## 🗺️ Sitemap Generation
+
+Run `pnpm run sitemap` to generate `public/sitemap.xml`. The script reads product slugs from the database and uses `SITE_URL` to build absolute URLs. It runs automatically after `pnpm run build`.
+
+---
+
+## 📊 Lighthouse CI
+
+Performance budgets are enforced with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci). Execute `pnpm exec lhci autorun` to run the checks locally. The same command runs in CI using `.github/workflows/lighthouse.yml`.
 
 ---
 
