@@ -132,9 +132,10 @@ pnpm run seed             # Populate sample data
 If you pull new migrations from version control, run `pnpm prisma migrate dev`
 again to update your local database.
 
-Before deploying the `20250702073610_unique_stripe_session` migration, make sure
-the `Order` table has no duplicate `stripeSessionId` values. Remove or merge
-duplicates before running `pnpm prisma migrate deploy`.
+Before deploying the `20250702112848_rename_stripe_to_paymentintent` migration,
+ensure the `Order` table has no duplicate `stripeSessionId` values so they can
+be safely renamed to `paymentIntentId`. Remove or merge any duplicates before
+running `pnpm prisma migrate deploy`.
 
 ---
 
