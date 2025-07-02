@@ -50,7 +50,12 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         slug: z.string(),
       })
 
-      const data = bodySchema.parse(request.body)
+      const parsed = bodySchema.safeParse(request.body)
+      if (!parsed.success) {
+        const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const data = parsed.data
       const product = await fastify.prisma.product.create({ data })
       reply.code(201)
       return product
@@ -76,8 +81,18 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
           message: 'No fields to update',
         })
 
-      const { id } = paramsSchema.parse(request.params)
-      const data = bodySchema.parse(request.body)
+      const paramsParsed = paramsSchema.safeParse(request.params)
+      if (!paramsParsed.success) {
+        const msg = paramsParsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const bodyParsed = bodySchema.safeParse(request.body)
+      if (!bodyParsed.success) {
+        const msg = bodyParsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const { id } = paramsParsed.data
+      const data = bodyParsed.data
       const product = await fastify.prisma.product.update({
         where: { id },
         data,
@@ -91,7 +106,12 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
     { preHandler: [fastify.authenticate, fastify.requireAdmin] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const paramsSchema = z.object({ id: z.string() })
-      const { id } = paramsSchema.parse(request.params)
+      const parsed = paramsSchema.safeParse(request.params)
+      if (!parsed.success) {
+        const msg = parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        return reply.code(400).send({ error: msg })
+      }
+      const { id } = parsed.data
       await fastify.prisma.product.delete({ where: { id } })
       reply.code(204)
     },
