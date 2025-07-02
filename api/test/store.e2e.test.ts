@@ -12,7 +12,7 @@ vi.mock('../src/lib/airwallex', () => ({
 
 beforeAll(() => {
   fetchMock = vi.fn()
-  global.fetch = fetchMock as any
+  global.fetch = fetchMock as unknown as typeof fetch
 })
 
 vi.mock('../src/lib/mailer', () => ({
