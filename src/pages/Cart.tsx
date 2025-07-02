@@ -63,6 +63,7 @@ const Cart: React.FC = () => {
                   <img
                     src={item.product.images[0]}
                     alt={item.product.name}
+                    loading="lazy"
                     className="w-20 h-20 object-cover rounded"
                   />
                   <div className="flex-1">

@@ -98,6 +98,7 @@ const Admin: React.FC = () => {
                     <img
                       src={product.images[0]}
                       alt={product.name}
+                      loading="lazy"
                       className="w-10 h-10 object-cover rounded mr-4"
                     />
                     <div>
