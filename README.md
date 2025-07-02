@@ -1,6 +1,7 @@
 # Giecos Solution
 
 A full‑stack demo storefront built with **Vite**, **React**, **Fastify**, and **Prisma**. The front‑end resides in the `src/` directory, and the backend API lives under `api/`. This starter kit is configured with TypeScript, Tailwind CSS, React Query, and Radix UI.
+It relies on **React Query** for fetching and caching server data across the application.
 Requires Node.js 18 or newer.
 
 ---
