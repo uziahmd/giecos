@@ -1,13 +1,15 @@
 import { describe, it, beforeAll, expect, vi } from 'vitest'
 import request from 'supertest'
 import { buildApp } from '../src/app'
+import { getAirwallexToken } from '../src/lib/airwallex'
 
-vi.mock('../src/lib/stripe', () => ({
-  default: {
-    checkout: { sessions: { retrieve: vi.fn().mockResolvedValue({ payment_intent: 'pi_1' }) } },
-    refunds: { create: vi.fn().mockResolvedValue({}) }
-  }
+vi.mock('../src/lib/airwallex', () => ({
+  getAirwallexToken: vi.fn().mockResolvedValue('tok'),
 }))
+
+beforeAll(() => {
+  global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as any
+})
 
 let app: ReturnType<typeof buildApp>
 let token: string
@@ -17,7 +19,7 @@ beforeAll(async () => {
   await app.listen({ port: 0 })
   const user = await app.prisma.user.create({ data: { email: 'a', password: 'x', isAdmin: true } })
   const product = await app.prisma.product.create({ data: { name: 'p', price: 1, description: 'd', category: 'c', slug: 's', images: [] } })
-  await app.prisma.order.create({ data: { id: 'o1', userId: user.id, status: 'PAID', stripeSessionId: 'sess', items: { create: { productId: product.id, quantity: 1, price: 1 } } } })
+  await app.prisma.order.create({ data: { id: 'o1', userId: user.id, status: 'PAID', paymentIntentId: 'pi_1', items: { create: { productId: product.id, quantity: 1, price: 1 } } } })
   token = app.jwt.sign({ id: user.id, isAdmin: true })
 })
 

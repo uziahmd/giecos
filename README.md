@@ -93,8 +93,9 @@ PORT="4000"
 RESEND_API_KEY="your-resend-api-key"
 RESEND_FROM="noreply@example.com"
 OTP_EXP_MINUTES="15"
-STRIPE_SECRET_KEY="your-stripe-secret"
-STRIPE_WEBHOOK_SECRET="whsec_example"
+AIRWALLEX_CLIENT_ID="your-client-id"
+AIRWALLEX_API_KEY="your-api-key"
+AIRWALLEX_WEBHOOK_SECRET="whsec_example"
 FRONTEND_URL="http://localhost:5173"
 SITE_URL="http://localhost:5173"
 ```
@@ -112,8 +113,9 @@ The backend uses the following variables:
 | `RESEND_API_KEY` | Credentials for the Resend email service |
 | `RESEND_FROM` | From address for sent emails |
 | `OTP_EXP_MINUTES` | Minutes before OTP codes expire |
-| `STRIPE_SECRET_KEY` | Secret key for Stripe server API |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `AIRWALLEX_CLIENT_ID` | Client ID for Airwallex API |
+| `AIRWALLEX_API_KEY` | API key for Airwallex |
+| `AIRWALLEX_WEBHOOK_SECRET` | Airwallex webhook signing secret |
 | `FRONTEND_URL` | Frontend URL used in checkout redirects |
 | `SITE_URL` | Canonical domain for the frontend |
 
@@ -186,8 +188,8 @@ Run common tasks from the project root:
   pnpm --filter ./api run test
   ```
   Required variables include `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`,
-  `RESEND_FROM`, `OTP_EXP_MINUTES`, `STRIPE_SECRET_KEY`,
-  `STRIPE_WEBHOOK_SECRET`, and `FRONTEND_URL`.
+  `RESEND_FROM`, `OTP_EXP_MINUTES`, `AIRWALLEX_CLIENT_ID`,
+  `AIRWALLEX_API_KEY`, `AIRWALLEX_WEBHOOK_SECRET`, and `FRONTEND_URL`.
 
 - **Playwright tests** (requires the frontend and API servers to be running):
   ```bash
@@ -251,15 +253,15 @@ The backend exposes REST endpoints for managing products and initiating checkout
 
 ## 🛒 Checkout Flow
 
-Stripe Checkout is used to collect payments.
+Airwallex payment intents are used to collect payments.
 
 ```
-Cart -> POST /api/checkout -> Stripe session
+Cart -> POST /api/checkout -> Airwallex intent
      -> user pays
-Stripe -> POST /api/stripe/webhook -> order marked PAID -> receipt email
+Airwallex -> POST /api/airwallex/webhook -> order marked PAID -> receipt email
 ```
 
-Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env` so success and cancel URLs work.
+Set `AIRWALLEX_CLIENT_ID`, `AIRWALLEX_API_KEY`, `AIRWALLEX_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env`.
 
 ---
 

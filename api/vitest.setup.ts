@@ -7,8 +7,9 @@ process.env.RESEND_API_KEY = 'test'
 process.env.RESEND_FROM = 'test@example.com'
 process.env.OTP_EXP_MINUTES = '15'
 process.env.FRONTEND_URL = 'http://localhost:8080'
-process.env.STRIPE_SECRET_KEY = 'test'
-process.env.STRIPE_WEBHOOK_SECRET = 'wh_test'
+process.env.AIRWALLEX_CLIENT_ID = 'test_id'
+process.env.AIRWALLEX_API_KEY = 'test_key'
+process.env.AIRWALLEX_WEBHOOK_SECRET = 'wh_test'
 process.env.ALLOW_REFUNDS = 'true'
 
 if (fs.existsSync('prisma/test.db')) {

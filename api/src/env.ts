@@ -8,8 +8,9 @@ const {
   RESEND_API_KEY,
   RESEND_FROM,
   OTP_EXP_MINUTES,
-  STRIPE_SECRET_KEY,
-  STRIPE_WEBHOOK_SECRET,
+  AIRWALLEX_CLIENT_ID,
+  AIRWALLEX_API_KEY,
+  AIRWALLEX_WEBHOOK_SECRET,
   FRONTEND_URL,
   PORT,
   IMG_BASE: IMG_BASE_RAW,
@@ -29,8 +30,9 @@ if (!JWT_SECRET) throw new Error('JWT_SECRET is required')
 if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY is required')
 if (!RESEND_FROM) throw new Error('RESEND_FROM is required')
 if (!OTP_EXP_MINUTES) throw new Error('OTP_EXP_MINUTES is required')
-if (!STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY is required')
-if (!STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET is required')
+if (!AIRWALLEX_CLIENT_ID) throw new Error('AIRWALLEX_CLIENT_ID is required')
+if (!AIRWALLEX_API_KEY) throw new Error('AIRWALLEX_API_KEY is required')
+if (!AIRWALLEX_WEBHOOK_SECRET) throw new Error('AIRWALLEX_WEBHOOK_SECRET is required')
 if (!FRONTEND_URL) throw new Error('FRONTEND_URL is required')
 
 export {
@@ -39,8 +41,9 @@ export {
   RESEND_API_KEY,
   RESEND_FROM,
   OTP_EXP_MINUTES,
-  STRIPE_SECRET_KEY,
-  STRIPE_WEBHOOK_SECRET,
+  AIRWALLEX_CLIENT_ID,
+  AIRWALLEX_API_KEY,
+  AIRWALLEX_WEBHOOK_SECRET,
   FRONTEND_URL,
   PORT,
 }
