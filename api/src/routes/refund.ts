@@ -9,7 +9,7 @@ const refundRoutes: FastifyPluginAsync = async (fastify) => {
     { preHandler: [fastify.authenticate, fastify.requireAdmin] },
     async (request: FastifyRequest, reply: FastifyReply) => {
       if (!ALLOW_REFUNDS) {
-        reply.code(403)
+        reply.code(404)
         return { error: 'Refunds disabled' }
       }
 
