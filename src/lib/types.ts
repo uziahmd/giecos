@@ -5,6 +5,10 @@ export interface Product {
   price: number;
   description: string;
   images: string[];
+  /**
+   * Current inventory quantity for this product
+   */
+  stock: number;
   inStock: boolean;
   category: string;
   slug: string;

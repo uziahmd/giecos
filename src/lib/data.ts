@@ -11,6 +11,7 @@ export const sampleProducts: Product[] = [
       'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop',
       'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&h=600&fit=crop',
     ],
+    stock: 25,
     inStock: true,
     category: 'Kitchen',
     slug: 'premium-coffee-maker'
@@ -24,6 +25,7 @@ export const sampleProducts: Product[] = [
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
       'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=600&fit=crop',
     ],
+    stock: 50,
     inStock: true,
     category: 'Home',
     slug: 'smart-air-purifier'
@@ -37,6 +39,7 @@ export const sampleProducts: Product[] = [
       'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop',
       'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&h=600&fit=crop',
     ],
+    stock: 0,
     inStock: false,
     category: 'Kitchen',
     slug: 'deluxe-stand-mixer'

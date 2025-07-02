@@ -26,12 +26,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="text-lg font-bold text-homeglow-primary">
               ${product.price.toFixed(2)}
             </span>
-            <span className={`px-2 py-1 text-xs rounded-full ${
-              product.inStock 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {product.inStock ? 'In Stock' : 'Out of Stock'}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                product.stock > 0
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
             </span>
           </div>
         </div>

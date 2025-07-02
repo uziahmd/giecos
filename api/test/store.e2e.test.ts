@@ -3,8 +3,8 @@ import request from 'supertest'
 import { buildApp } from '../src/app'
 
 let app: ReturnType<typeof buildApp>
-let checkoutCreate: any
-let constructEvent: any
+let checkoutCreate: vi.Mock
+let constructEvent: vi.Mock
 
 vi.mock('../src/lib/stripe', () => {
   checkoutCreate = vi.fn().mockResolvedValue({ id: 'sess_checkout', url: 'https://example.com/c' })

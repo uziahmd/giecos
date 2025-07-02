@@ -21,6 +21,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import VerifyOtp from "@/pages/VerifyOtp";
 import Admin from "@/pages/Admin";
+import Orders from "@/pages/Orders";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/verify-otp" element={<VerifyOtp />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/account/orders" element={<Orders />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
