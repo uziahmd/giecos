@@ -22,10 +22,12 @@ Requires Node.js 20 or newer.
 12. [Authentication Workflow](#authentication-workflow)
 13. [Checkout Flow](#checkout-flow)
 14. [Order History](#order-history)
-15. [Sitemap Generation](#sitemap-generation)
-16. [Lighthouse CI](#lighthouse-ci)
-17. [Building for Production](#building-for-production)
-18. [Project Structure](#project-structure)
+15. [Image Uploading](#image-uploading)
+16. [Refund Flow](docs/refund-flow.md)
+17. [Sitemap Generation](#sitemap-generation)
+18. [Lighthouse CI](#lighthouse-ci)
+19. [Building for Production](#building-for-production)
+20. [Project Structure](#project-structure)
 
 ---
 
@@ -35,7 +37,7 @@ Requires Node.js 20 or newer.
 * **Product Details**: View detailed information and add to cart.
 * **Shopping Cart**: Add, update, and remove items with real-time totals and persistent storage.
 * **Authentication**: Email signup/login with JWT-based protection.
-* **Admin Dashboard**: In-memory CRUD for products.
+* **Admin Dashboard**: Manage products with image uploads and issue refunds.
 * **Contact Form**: Sends inquiries via API endpoint with confirmation toasts.
 * **Responsive Design**: Optimized for desktop, tablet, and mobile.
 
@@ -320,3 +322,7 @@ The optimized assets output to `dist/`.
 ---
 
 *Last updated: July 1, 2025*
+
+## 📷 Image Uploading
+
+Product images can be uploaded via the `/api/products/upload` endpoint. The admin UI allows selecting a file which is resized server-side using Sharp and served from `/uploads`.

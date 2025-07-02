@@ -1,7 +1,13 @@
+import { join } from 'path'
 import { PORT } from './env'
 import { buildApp } from './app'
+import fastifyStatic from 'fastify-static'
 
 const app = buildApp()
+app.register(fastifyStatic, {
+  root: join(__dirname, '../uploads'),
+  prefix: '/uploads',
+})
 
 const port = PORT ? parseInt(PORT, 10) : 4000
 

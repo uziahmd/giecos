@@ -8,12 +8,30 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import ProductModal from '@/components/ProductModal';
 
+interface OrderItem {
+  id: string;
+  quantity: number;
+  price: number;
+  product: Product;
+}
+
+interface Order {
+  id: string;
+  status: string;
+  createdAt: string;
+  items: OrderItem[];
+}
+
 const Admin: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: products = [], isLoading } = useQuery<Product[]>(
     ['/api/products'],
     () => fetcher<Product[]>('/api/products')
+  );
+  const { data: orders = [] } = useQuery<Order[]>(
+    ['/api/orders'],
+    () => fetcher<Order[]>('/api/orders')
   );
   const { toast } = useToast();
 
@@ -46,10 +64,49 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleRefund = async (id: string) => {
+    const res = await fetch(`/api/orders/${id}/refund`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    if (res.ok) {
+      toast({ title: 'Refund issued' });
+      queryClient.invalidateQueries(['/api/orders']);
+    } else {
+      toast({ title: 'Refund failed', description: `${res.status}` });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <p>Loading...</p>
+      </div>
+
+      <h2 className="text-2xl font-semibold mt-12 mb-4">Orders</h2>
+      <div className="bg-white rounded-md shadow-md overflow-hidden mb-8">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td className="px-6 py-4 whitespace-nowrap">{order.id.slice(0,8)}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order.status}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  {order.status === 'PAID' && (
+                    <button onClick={() => handleRefund(order.id)} className="text-homeglow-primary hover:text-homeglow-accent">Refund</button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }
