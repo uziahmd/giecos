@@ -54,7 +54,7 @@ describe('product and checkout flow', () => {
   it('checkout marks order as paid', async () => {
     const user = await app.prisma.user.create({ data: { email: 'shopper@example.com', password: 'x' } })
     const product = await app.prisma.product.create({
-      data: { name: 'Item', price: 2, description: 'd', category: 'c', slug: 'item', images: [] },
+      data: { name: 'Item', price: 2, description: 'd', category: 'c', slug: 'item', images: [], stock: 5 },
     })
     const token = app.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
 
@@ -81,5 +81,19 @@ describe('product and checkout flow', () => {
 
     const order = await app.prisma.order.findFirst({ where: { stripeSessionId: 'sess_checkout' } })
     expect(order?.status).toBe('PAID')
+  })
+
+  it('rejects checkout with invalid quantity', async () => {
+    const user = await app.prisma.user.create({ data: { email: 'bad@example.com', password: 'x' } })
+    const product = await app.prisma.product.create({
+      data: { name: 'BadItem', price: 1, description: 'd', category: 'c', slug: 'bad', images: [], stock: 5 },
+    })
+    const token = app.jwt.sign({ id: user.id, isAdmin: user.isAdmin })
+
+    await request(app.server)
+      .post('/api/checkout')
+      .set('Cookie', `token=${token}`)
+      .send({ items: [{ id: product.id, qty: 0 }] })
+      .expect(400)
   })
 })

@@ -16,7 +16,7 @@ afterAll(async () => {
 describe('latest order endpoint', () => {
   it('returns most recent order for user', async () => {
     const user = await app.prisma.user.create({ data: { email: 'order@example.com', password: 'x' } })
-    const product = await app.prisma.product.create({ data: { name: 'Item', price: 5, description: 'd', category: 'c', slug: 'item', images: [] } })
+    const product = await app.prisma.product.create({ data: { name: 'Item', price: 5, description: 'd', category: 'c', slug: 'order-item', images: [], stock: 5 } })
 
     await app.prisma.order.create({
       data: {
