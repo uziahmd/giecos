@@ -1,14 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { writeFile } from 'fs/promises';
-import slugify from 'slugify';
 import 'dotenv/config';
 
 const prisma = new PrismaClient();
 const SITE_URL = process.env.SITE_URL || 'http://localhost:5173';
 
 async function main() {
-  const products = await prisma.product.findMany({ select: { name: true } });
-  const slugs = products.map(p => slugify(p.name, { lower: true }));
+  const products = await prisma.product.findMany({ select: { slug: true } });
+  const slugs = products.map(p => p.slug);
 
   const staticRoutes = [
     '/',
