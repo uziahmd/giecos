@@ -1,0 +1,1 @@
+-- Add CANCELLED status to OrderStatus enum

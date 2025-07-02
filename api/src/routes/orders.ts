@@ -28,6 +28,34 @@ const ordersRoutes: FastifyPluginAsync = async (fastify) => {
 
     return order
   })
+
+  fastify.post('/orders/:id/cancel', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
+    const paramsSchema = z.object({ id: z.string() })
+    const { id } = paramsSchema.parse(request.params)
+    const userId = (request.user as { id: string }).id
+
+    const order = await fastify.prisma.order.findFirst({
+      where: { id, userId },
+      include: { items: true },
+    })
+
+    if (!order || order.status !== 'PENDING') {
+      reply.code(400)
+      return { error: 'Order not cancellable' }
+    }
+
+    await fastify.prisma.$transaction(async (tx) => {
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        })
+      }
+      await tx.order.update({ where: { id }, data: { status: 'CANCELLED' } })
+    })
+
+    return { status: 'ok' }
+  })
 }
 
 export default ordersRoutes
