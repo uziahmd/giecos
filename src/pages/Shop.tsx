@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
+import ProductCardSkeleton from '@/components/ProductCardSkeleton';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Product } from '@/lib/types';
@@ -118,7 +119,11 @@ const Shop: React.FC = () => {
 
       {/* Products Grid */}
       {isLoading ? (
-        <p>Loading...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

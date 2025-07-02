@@ -1,24 +1,32 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
 import { apiPost } from '@/lib/apiPost';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Signup: React.FC = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+  type FormValues = {
+    name: string;
+    email: string;
+    password: string;
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { name: '', email: '', password: '' },
   });
   const { toast } = useToast();
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const handleSignupSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: FormValues) => {
     try {
-      await apiPost('/api/signup', formData);
+      await apiPost('/api/signup', values);
       const me = await fetch('/api/me', { credentials: 'include' });
       if (me.ok) {
         setUser(await me.json());
@@ -27,17 +35,10 @@ const Signup: React.FC = () => {
         title: 'Verification code sent!',
         description: 'Check your email for the 6-digit verification code.',
       });
-      navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+      navigate(`/verify-otp?email=${encodeURIComponent(values.email)}`);
     } catch (err) {
       toast({ title: 'Signup failed', description: (err as Error).message });
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   return (
@@ -53,7 +54,7 @@ const Signup: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-md shadow-md p-8">
-          <form onSubmit={handleSignupSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
@@ -61,12 +62,12 @@ const Signup: React.FC = () => {
                 <input
                   type="text"
                   id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
+                  {...register('name', { required: 'Name is required' })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
                 />
+                {errors.name && (
+                  <p className="text-destructive text-sm mt-1">{errors.name.message}</p>
+                )}
               </div>
 
               <div>
@@ -76,12 +77,15 @@ const Signup: React.FC = () => {
                 <input
                   type="email"
                   id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: { value: /.+@.+\..+/, message: 'Invalid email' },
+                  })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
                 />
+                {errors.email && (
+                  <p className="text-destructive text-sm mt-1">{errors.email.message}</p>
+                )}
               </div>
 
               <div>
@@ -91,12 +95,12 @@ const Signup: React.FC = () => {
                 <input
                   type="password"
                   id="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
+                  {...register('password', { required: 'Password is required' })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
                 />
+                {errors.password && (
+                  <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
+                )}
               </div>
 
               <button

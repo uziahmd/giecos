@@ -7,6 +7,7 @@ import type { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import ProductModal from '@/components/ProductModal';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface OrderItem {
   id: string;
@@ -79,34 +80,73 @@ const Admin: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p>Loading...</p>
-      </div>
-
-      <h2 className="text-2xl font-semibold mt-12 mb-4">Orders</h2>
-      <div className="bg-white rounded-md shadow-md overflow-hidden mb-8">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{order.id.slice(0,8)}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.status}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {order.status === 'PAID' && (
-                    <button onClick={() => handleRefund(order.id)} className="text-homeglow-primary hover:text-homeglow-accent">Refund</button>
-                  )}
-                </td>
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-md shadow-md overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-4">
+                      <Skeleton className="w-10 h-10 rounded" />
+                      <div className="flex-1 space-y-1">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-4 w-16" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-4 w-20" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Skeleton className="h-4 w-20" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h2 className="text-2xl font-semibold mt-12 mb-4">Orders</h2>
+        <div className="bg-white rounded-md shadow-md overflow-hidden mb-8">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.id.slice(0,8)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{order.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {order.status === 'PAID' && (
+                      <button onClick={() => handleRefund(order.id)} className="text-homeglow-primary hover:text-homeglow-accent">Refund</button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }

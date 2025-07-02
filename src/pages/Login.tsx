@@ -1,23 +1,31 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
 import { apiPost } from '@/lib/apiPost';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+  type FormValues = {
+    email: string;
+    password: string;
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { email: '', password: '' },
   });
   const { toast } = useToast();
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: FormValues) => {
     try {
-      await apiPost('/api/login', formData);
+      await apiPost('/api/login', values);
       const me = await fetch('/api/me', { credentials: 'include' });
       if (me.ok) {
         setUser(await me.json());
@@ -30,13 +38,6 @@ const Login: React.FC = () => {
     } catch (err) {
       toast({ title: 'Login failed', description: (err as Error).message });
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   return (
@@ -52,7 +53,7 @@ const Login: React.FC = () => {
         </div>
         
         <div className="bg-white rounded-md shadow-md p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
@@ -60,12 +61,15 @@ const Login: React.FC = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: { value: /.+@.+\..+/, message: 'Invalid email' },
+                })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
               />
+              {errors.email && (
+                <p className="text-destructive text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -75,12 +79,12 @@ const Login: React.FC = () => {
               <input
                 type="password"
                 id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+                {...register('password', { required: 'Password is required' })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-homeglow-primary focus:border-transparent"
               />
+              {errors.password && (
+                <p className="text-destructive text-sm mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             <button
