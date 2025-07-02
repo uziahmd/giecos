@@ -8,10 +8,20 @@ import Stripe from 'stripe'
 const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/checkout', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
     const bodySchema = z.object({
-      items: z.array(z.object({ id: z.string(), qty: z.number() })),
+      items: z.array(
+        z.object({
+          id: z.string(),
+          qty: z.number().min(1),
+        }),
+      ),
     })
 
-    const { items } = bodySchema.parse(request.body)
+    const parsed = bodySchema.safeParse(request.body)
+    if (!parsed.success) {
+      reply.code(400)
+      return { error: 'Invalid request body' }
+    }
+    const { items } = parsed.data
     const productIds = items.map((i) => i.id)
     const userId = (request.user as { id: string }).id
 
