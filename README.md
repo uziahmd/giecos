@@ -159,9 +159,9 @@ pnpm dev\:api
 pnpm dev
 ````
 
-* Vite dev server at `http://localhost:8080`, proxies `/api` requests.
+* Vite dev server at `http://localhost:5173`, proxies `/api` requests.
 
-Visit `http://localhost:8080` to view the app.
+Visit `http://localhost:5173` to view the app.
 
 ---
 

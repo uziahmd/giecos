@@ -46,7 +46,7 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
   })
 
   // admin login and add product
-  await page.goto('http://localhost:8080/login')
+  await page.goto('http://localhost:5173/login')
   await page.fill('input[name="email"]', adminEmail)
   await page.fill('input[name="password"]', 'secret')
   await Promise.all([
@@ -54,7 +54,7 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
     page.getByRole('button', { name: /sign in/i }).click(),
   ])
 
-  await page.goto('http://localhost:8080/admin')
+  await page.goto('http://localhost:5173/admin')
   await page.getByText('Add Product').click()
   await page.fill('input[name="name"]', 'Playwright Product')
   await page.fill('input[name="price"]', '99.99')
@@ -67,7 +67,7 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
   await expect(page.getByText('Playwright Product')).toBeVisible()
 
   // shopper login
-  await page.goto('http://localhost:8080/login')
+  await page.goto('http://localhost:5173/login')
   await page.fill('input[name="email"]', shopperEmail)
   await page.fill('input[name="password"]', 'secret')
   await Promise.all([
@@ -75,11 +75,11 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
     page.getByRole('button', { name: /sign in/i }).click(),
   ])
 
-  await page.goto('http://localhost:8080/shop')
+  await page.goto('http://localhost:5173/shop')
   await page.getByText('Playwright Product').click()
   await page.getByRole('button', { name: /add to cart/i }).click()
 
-  await page.goto('http://localhost:8080/cart')
+  await page.goto('http://localhost:5173/cart')
   await Promise.all([
     page.waitForResponse((res) => res.url().endsWith('/api/checkout')),
     page.getByRole('button', { name: /proceed to checkout/i }).click(),
