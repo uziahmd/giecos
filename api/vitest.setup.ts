@@ -8,6 +8,7 @@ process.env.DATABASE_URL = CLI_DB_URL
 process.env.JWT_SECRET = 'testsecret'
 process.env.RESEND_API_KEY = 'test'
 process.env.RESEND_FROM = 'test@example.com'
+process.env.ADMIN_EMAIL = 'admin@example.com'
 process.env.OTP_EXP_MINUTES = '15'
 process.env.FRONTEND_URL = 'http://localhost:5173'
 process.env.AIRWALLEX_CLIENT_ID = 'test_id'
