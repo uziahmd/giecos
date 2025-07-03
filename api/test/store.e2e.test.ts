@@ -79,7 +79,21 @@ describe('product and checkout flow', () => {
     const res = await request(app.server)
       .post('/api/checkout')
       .set('Cookie', `token=${token}`)
-      .send({ items: [{ id: product.id, qty: 1 }] })
+      .send({
+        items: [{ id: product.id, qty: 1 }],
+        orderNumber: 'ORD-1',
+        firstName: 'A',
+        lastName: 'B',
+        phone: '111',
+        secondaryPhone: '222',
+        address1: 'addr1',
+        address2: 'addr2',
+        city: 'City',
+        state: 'ST',
+        postalCode: '12345',
+        country: 'US',
+        instructions: 'none',
+      })
       .expect(200)
 
     expect(res.body.id).toBe('pi_1')
@@ -105,7 +119,18 @@ describe('product and checkout flow', () => {
     await request(app.server)
       .post('/api/checkout')
       .set('Cookie', `token=${token}`)
-      .send({ items: [{ id: product.id, qty: 0 }] })
+      .send({
+        items: [{ id: product.id, qty: 0 }],
+        orderNumber: 'ORD-2',
+        firstName: 'Bad',
+        lastName: 'User',
+        phone: '999',
+        address1: 'addr',
+        city: 'C',
+        state: 'ST',
+        postalCode: '123',
+        country: 'US',
+      })
       .expect(400)
   })
 })

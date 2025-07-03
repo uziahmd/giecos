@@ -13,6 +13,7 @@ model User {
   id       String   @id @default(cuid())
   email    String   @unique
   name     String?
+  phone    String?
   password String
   otpHash  String?
   otpExpiry DateTime?
@@ -42,6 +43,19 @@ model Order {
   paymentIntentId String? @unique
   status    OrderStatus @default(PENDING)
   items     OrderItem[]
+
+  orderNumber    String?
+  firstName      String?
+  lastName       String?
+  phone          String?
+  secondaryPhone String?
+  address1       String?
+  address2       String?
+  city           String?
+  state          String?
+  postalCode     String?
+  country        String?
+  instructions   String?
 }
 
 model OrderItem {
