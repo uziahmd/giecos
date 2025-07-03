@@ -14,20 +14,21 @@ Requires Node.js 20 or newer.
 4. [Configuration](#configuration)
 5. [Environment Variables](#environment-variables)
 6. [Database Setup](#database-setup)
-7. [Development](#development)
-8. [Scripts](#scripts)
-9. [Testing & Linting](#testing--linting)
-10. [Manual Testing Checklist](#manual-testing-checklist)
-11. [API Endpoints](#api-endpoints)
-12. [Authentication Workflow](#authentication-workflow)
-13. [Checkout Flow](#checkout-flow)
-14. [Order History](#order-history)
-15. [Image Uploading](#image-uploading)
-16. [Refund Flow](docs/refund-flow.md)
-17. [Sitemap Generation](#sitemap-generation)
-18. [Lighthouse CI](#lighthouse-ci)
-19. [Building for Production](#building-for-production)
-20. [Project Structure](#project-structure)
+7. [Admin Account](#admin-account)
+8. [Development](#development)
+9. [Scripts](#scripts)
+10. [Testing & Linting](#testing--linting)
+11. [Manual Testing Checklist](#manual-testing-checklist)
+12. [API Endpoints](#api-endpoints)
+13. [Authentication Workflow](#authentication-workflow)
+14. [Checkout Flow](#checkout-flow)
+15. [Order History](#order-history)
+16. [Image Uploading](#image-uploading)
+17. [Refund Flow](docs/refund-flow.md)
+18. [Sitemap Generation](#sitemap-generation)
+19. [Lighthouse CI](#lighthouse-ci)
+20. [Building for Production](#building-for-production)
+21. [Project Structure](#project-structure)
 
 ---
 
@@ -143,6 +144,21 @@ pnpm run seed             # Populate sample data
 ````
 If you pull new migrations from version control, run `pnpm prisma migrate dev`
 again to update your local database.
+
+---
+
+## 🛡️ Admin Account
+
+To manage products and orders you'll need at least one admin user. Launch Prisma
+Studio and edit the `isAdmin` field:
+
+```bash
+pnpm prisma:studio
+```
+
+Locate your user record in the `User` table and set `isAdmin` to `true` (or use
+any database tool to do the same). Logging in with this account grants access to
+`/admin` for full CRUD operations.
 
 ---
 
