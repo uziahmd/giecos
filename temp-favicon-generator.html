@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Generator</title>
+</head>
+<body>
+    <canvas id="faviconCanvas" width="32" height="32"></canvas>
+    <script>
+        const canvas = document.getElementById('faviconCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set background to transparent
+        ctx.clearRect(0, 0, 32, 32);
+        
+        // Draw burgundy circle
+        ctx.beginPath();
+        ctx.arc(16, 16, 12, 0, 2 * Math.PI);
+        ctx.fillStyle = '#800020';
+        ctx.fill();
+        
+        // Convert to data URL and download
+        const dataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = 'favicon.png';
+        link.href = dataURL;
+        link.click();
+    </script>
+</body>
+</html>
