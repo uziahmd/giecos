@@ -85,7 +85,7 @@ export function sendAdminOrderNotification(
     order.address2,
     [order.city, order.state, order.postalCode].filter(Boolean).join(' '),
     order.country,
-    `Phone: ${order.phone}`,
+    order.phone ? `Phone: ${order.phone}` : undefined,
     order.secondaryPhone ? `Secondary: ${order.secondaryPhone}` : undefined,
     order.instructions ? `Instructions: ${order.instructions}` : undefined,
   ]
