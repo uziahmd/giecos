@@ -6,12 +6,29 @@ import { fetcher } from '@/lib/api';
 import type { Product } from '@/lib/types';
 
 const TrendingSection: React.FC = () => {
-  const { data: products = [], isLoading } = useQuery<Product[]>(
-    ['/api/products'],
-    () => fetcher<Product[]>('/api/products')
-  );
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
+    queryKey: ['/api/products'],
+    queryFn: () => fetcher<Product[]>('/api/products'),
+    retry: 1
+  });
 
-  const trendingProducts = products.slice(0, 3);
+  console.log('TrendingSection: Rendering, isLoading:', isLoading, 'error:', error);
+
+  const trendingProducts = Array.isArray(products) ? products.slice(0, 3) : [];
+
+  if (error) {
+    console.error('TrendingSection: Error state:', error);
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-playfair font-bold text-homeglow-primary mb-4">
+            Trending Now
+          </h2>
+          <p className="text-gray-600">Unable to load trending products at the moment.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (

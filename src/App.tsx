@@ -35,6 +35,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const location = useLocation();
+  
   useEffect(() => {
     NProgress.configure({ showSpinner: false });
   }, []);
@@ -45,6 +46,7 @@ const App = () => {
       NProgress.start();
     };
   }, [location.pathname]);
+  
   return (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>

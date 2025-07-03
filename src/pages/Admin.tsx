@@ -26,14 +26,16 @@ interface Order {
 const Admin: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { data: products = [], isLoading } = useQuery<Product[]>(
-    ['/api/products'],
-    () => fetcher<Product[]>('/api/products')
-  );
-  const { data: orders = [] } = useQuery<Order[]>(
-    ['/api/orders'],
-    () => fetcher<Order[]>('/api/orders')
-  );
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
+    queryKey: ['/api/products'],
+    queryFn: () => fetcher<Product[]>('/api/products'),
+    retry: 1
+  });
+  const { data: orders = [] } = useQuery<Order[]>({
+    queryKey: ['/api/orders'],
+    queryFn: () => fetcher<Order[]>('/api/orders'),
+    retry: 1
+  });
   const { toast } = useToast();
 
   const [modalOpen, setModalOpen] = useState(false);

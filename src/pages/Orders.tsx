@@ -22,16 +22,17 @@ interface Order {
 const Orders: React.FC = () => {
   const { user } = useAuth();
 
-  const { data: orders = [], isLoading } = useQuery<Order[]>(
-    ['/api/orders'],
-    async () => {
+  const { data: orders = [], isLoading, error } = useQuery<Order[]>({
+    queryKey: ['/api/orders'],
+    queryFn: async () => {
       const res = await fetch('/api/orders', { credentials: 'include' });
       if (!res.ok) {
         throw new Error('Failed to fetch orders');
       }
       return res.json();
-    }
-  );
+    },
+    retry: 1
+  });
 
   if (!user) {
     return <Navigate to="/login" replace />;

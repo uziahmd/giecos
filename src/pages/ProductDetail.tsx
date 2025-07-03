@@ -15,10 +15,11 @@ const ProductDetail: React.FC = () => {
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  const { data: products = [], isLoading } = useQuery<Product[]>(
-    ["/api/products"],
-    () => fetcher<Product[]>("/api/products"),
-  );
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    queryFn: () => fetcher<Product[]>("/api/products"),
+    retry: 1
+  });
 
   const product = products.find((p) => p.slug === slug);
 

@@ -23,8 +23,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const data: User = await res.json();
           setUser(data);
         }
-      } catch {
-        // ignore
+      } catch (error) {
+        // Silently ignore auth errors
+        console.log('Auth check failed:', error);
       }
     };
     load();

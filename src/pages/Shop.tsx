@@ -15,10 +15,11 @@ const Shop: React.FC = () => {
   const [filterInStock, setFilterInStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
-  const { data: products = [], isLoading } = useQuery<Product[]>(
-    ['/api/products'],
-    () => fetcher<Product[]>('/api/products')
-  );
+  const { data: products = [], isLoading, error } = useQuery<Product[]>({
+    queryKey: ['/api/products'],
+    queryFn: () => fetcher<Product[]>('/api/products'),
+    retry: 1
+  });
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products;
@@ -118,7 +119,17 @@ const Shop: React.FC = () => {
       </div>
 
       {/* Products Grid */}
-      {isLoading ? (
+      {error ? (
+        <div className="text-center py-12">
+          <p className="text-red-500 mb-4">Failed to load products. Please try again later.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-homeglow-primary text-white px-4 py-2 rounded-md hover:bg-homeglow-accent transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      ) : isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
