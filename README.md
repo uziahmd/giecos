@@ -39,7 +39,9 @@ Requires Node.js 20 or newer.
 * **Airwallex Payments**: Secure checkout using Airwallex payment intents.
 * **Authentication**: Email signup/login with JWT-based protection.
 * **Admin Dashboard**: Manage products with image uploads and issue refunds.
+* **Shipping Form**: Collect shipping details before payment.
 * **Contact Form**: Sends inquiries via API endpoint with confirmation toasts.
+* **Admin Notifications**: Emails the admin when orders are paid.
 * **Responsive Design**: Optimized for desktop, tablet, and mobile.
 
 ---
@@ -113,6 +115,7 @@ The backend uses the following variables:
 | `PORT` | API server port (defaults to `4000`) |
 | `RESEND_API_KEY` | Credentials for the Resend email service |
 | `RESEND_FROM` | From address for sent emails |
+| `ADMIN_EMAIL` | Address that receives order notifications |
 | `OTP_EXP_MINUTES` | Minutes before OTP codes expire |
 | `AIRWALLEX_CLIENT_ID` | Client ID for Airwallex API |
 | `AIRWALLEX_API_KEY` | API key for Airwallex |
@@ -124,6 +127,9 @@ Create an Airwallex account and open the **Developer** dashboard. Generate a
 client ID and API key under **API Keys** and copy the webhook signing secret from
 the **Webhooks** section. Use these test credentials in your `.env` file when
 running locally.
+
+Set `ADMIN_EMAIL` to the address that should receive order paid notifications.
+Emails are sent via the Resend API using the `RESEND_*` credentials.
 
 ---
 
@@ -219,11 +225,12 @@ Run common tasks from the project root:
 3. **Shop Page**: Products display; filtering, search, sorting work.
 4. **Product Detail**: `/product/:slug` shows details; cart addition works.
 5. **Cart**: Add, update, remove items; totals and localStorage update.
-6. **Authentication**: Signup/login flows and toasts display correctly.
-7. **Admin Dashboard**: In-memory add/edit/delete products.
+6. **Shipping Page**: `/shipping` collects address details before payment.
+7. **Authentication**: Signup/login flows and toasts display correctly.
+8. **Admin Dashboard**: In-memory add/edit/delete products.
 
-8. **Contact Form**: Submission logs message and shows toast.
-9. **404 Page**: Unknown routes show custom 404 message.
+9. **Contact Form**: Submission logs message and shows toast.
+10. **404 Page**: Unknown routes show custom 404 message.
 
 ---
 
@@ -258,12 +265,18 @@ The backend exposes REST endpoints for managing products and initiating checkout
 Airwallex payment intents are used to collect payments.
 
 ```
-Cart -> POST /api/checkout -> Airwallex intent
+Cart -> Shipping form -> POST /api/checkout -> Airwallex intent
      -> user pays
-Airwallex -> POST /api/airwallex/webhook -> order marked PAID -> receipt email
+Airwallex -> POST /api/airwallex/webhook -> order marked PAID
+          -> receipt email to user and admin
 ```
 
 Set `AIRWALLEX_CLIENT_ID`, `AIRWALLEX_API_KEY`, `AIRWALLEX_WEBHOOK_SECRET`, and `FRONTEND_URL` in `.env`. Configure a webhook in your Airwallex dashboard for `payment_intent.succeeded` events pointing to `/api/airwallex/webhook`.
+
+The shipping form collects optional fields such as order number, recipient name,
+phone numbers, address lines, city/state/postal code, country and delivery
+instructions. These values are stored on each `Order` and appear in the admin
+notification email.
 
 ---
 
