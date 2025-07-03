@@ -3,25 +3,11 @@ import { Plus, Edit, X } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { fetcher } from '@/lib/api';
-import type { Product } from '@/lib/types';
+import type { Product, Order } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import ProductModal from '@/components/ProductModal';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface OrderItem {
-  id: string;
-  quantity: number;
-  price: number;
-  product: Product;
-}
-
-interface Order {
-  id: string;
-  status: string;
-  createdAt: string;
-  items: OrderItem[];
-}
 
 const Admin: React.FC = () => {
   const { user } = useAuth();
@@ -61,7 +47,7 @@ const Admin: React.FC = () => {
     });
     if (res.ok) {
       toast({ title: 'Product deleted!' });
-      queryClient.invalidateQueries(['/api/products']);
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
     } else {
       toast({ title: 'Deletion failed', description: `${res.status}` });
     }
@@ -74,7 +60,7 @@ const Admin: React.FC = () => {
     });
     if (res.ok) {
       toast({ title: 'Refund issued' });
-      queryClient.invalidateQueries(['/api/orders']);
+      queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
     } else {
       toast({ title: 'Refund failed', description: `${res.status}` });
     }
@@ -129,19 +115,50 @@ const Admin: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order #</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.id.slice(0,8)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{order.status}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">
+                      #{order.orderNumber || order.id.slice(0, 8)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {order.firstName && order.lastName ? `${order.firstName} ${order.lastName}` : 'N/A'}
+                    </div>
+                    {order.phone && (
+                      <div className="text-sm text-gray-500">{order.phone}</div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      order.status === 'PAID'
+                        ? 'bg-green-100 text-green-800'
+                        : order.status === 'CANCELLED'
+                        ? 'bg-gray-100 text-gray-800'
+                        : order.status === 'REFUNDED'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {order.status === 'PAID' && (
-                      <button onClick={() => handleRefund(order.id)} className="text-homeglow-primary hover:text-homeglow-accent">Refund</button>
+                      <button onClick={() => handleRefund(order.id)} className="text-homeglow-primary hover:text-homeglow-accent">
+                        Refund
+                      </button>
                     )}
                   </td>
                 </tr>

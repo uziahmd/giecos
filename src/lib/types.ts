@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -37,6 +36,33 @@ export interface AuthForm {
 }
 
 export interface ShippingData {
+  orderNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  secondaryPhone?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  instructions?: string;
+}
+
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  price: number;
+  product: Product;
+}
+
+export interface Order {
+  id: string;
+  createdAt: string;
+  status: string;
+  items: OrderItem[];
+  // Shipping fields
   orderNumber?: string;
   firstName?: string;
   lastName?: string;
