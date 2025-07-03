@@ -4,34 +4,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Minus, X } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { getCartTotal } from '@/lib/cart';
-import { apiPost } from '@/lib/apiPost';
-import { useToast } from '@/hooks/use-toast';
 
 const Cart: React.FC = () => {
   const { items, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const total = getCartTotal(items);
-  const { toast } = useToast();
 
-  const handleCheckout = async () => {
-    try {
-      const intent = await apiPost<{ id: string; client_secret: string }>(
-        '/api/checkout',
-        {
-          items: items.map((i) => ({ id: i.product.id, qty: i.quantity })),
-        },
-      );
-      navigate(
-        `/checkout?id=${encodeURIComponent(intent.id)}&client_secret=${encodeURIComponent(
-          intent.client_secret,
-        )}`,
-      );
-    } catch (err) {
-      toast({
-        title: 'Checkout failed',
-        description: (err as Error).message,
-      });
-    }
+  const handleCheckout = () => {
+    navigate('/shipping');
   };
 
   if (items.length === 0) {

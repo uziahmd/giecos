@@ -3,7 +3,19 @@ import { useCart } from '@/contexts/CartContext';
 
 interface Order {
   id: string;
+  orderNumber?: string;
   total: number;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  secondaryPhone?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  instructions?: string;
 }
 
 const Success: React.FC = () => {
@@ -27,7 +39,22 @@ const Success: React.FC = () => {
                 sum + item.price * item.quantity,
               0,
             );
-          setOrder({ id: data.id, total });
+          setOrder({
+            id: data.id,
+            orderNumber: data.orderNumber,
+            total,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone,
+            secondaryPhone: data.secondaryPhone,
+            address1: data.address1,
+            address2: data.address2,
+            city: data.city,
+            state: data.state,
+            postalCode: data.postalCode,
+            country: data.country,
+            instructions: data.instructions,
+          });
         }
       } catch {
         // ignore errors fetching optional order info
@@ -43,11 +70,28 @@ const Success: React.FC = () => {
         Thank you for your purchase!
       </h1>
       {order ? (
-        <p className="text-gray-600">
-          Order ID: <strong>{order.id}</strong>
-          <br />
-          Total: ${order.total.toFixed(2)}
-        </p>
+        <div className="text-gray-600 space-y-2">
+          <p>
+            Order #: <strong>{order.orderNumber ?? order.id}</strong>
+          </p>
+          <p>Total: ${order.total.toFixed(2)}</p>
+          {(order.firstName || order.address1) && (
+            <div className="mt-4 space-y-1">
+              {order.firstName && (
+                <p>
+                  {order.firstName} {order.lastName}
+                </p>
+              )}
+              {order.address1 && <p>{order.address1}</p>}
+              {order.address2 && <p>{order.address2}</p>}
+              <p>
+                {order.city} {order.state} {order.postalCode}
+              </p>
+              <p>{order.country}</p>
+              {order.instructions && <p>Instructions: {order.instructions}</p>}
+            </div>
+          )}
+        </div>
       ) : (
         <p className="text-gray-600">Your order was placed successfully.</p>
       )}

@@ -35,3 +35,18 @@ export interface AuthForm {
   password: string;
   name?: string;
 }
+
+export interface ShippingData {
+  orderNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  secondaryPhone?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  instructions?: string;
+}
