@@ -14,6 +14,18 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
           qty: z.number().min(1),
         }),
       ),
+      orderNumber: z.string().optional(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+      phone: z.string().optional(),
+      secondaryPhone: z.string().optional(),
+      address1: z.string().optional(),
+      address2: z.string().optional(),
+      city: z.string().optional(),
+      state: z.string().optional(),
+      postalCode: z.string().optional(),
+      country: z.string().optional(),
+      instructions: z.string().optional(),
     })
 
     const parsed = bodySchema.safeParse(request.body)
@@ -21,7 +33,21 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
       reply.code(400)
       return { error: 'Invalid request body' }
     }
-    const { items } = parsed.data
+    const {
+      items,
+      orderNumber,
+      firstName,
+      lastName,
+      phone,
+      secondaryPhone,
+      address1,
+      address2,
+      city,
+      state,
+      postalCode,
+      country,
+      instructions,
+    } = parsed.data
     const productIds = items.map((i) => i.id)
     const userId = (request.user as { id: string }).id
 
@@ -72,11 +98,27 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
           client_secret: string
         }
 
+        if (phone) {
+          await tx.user.update({ where: { id: userId }, data: { phone } })
+        }
+
         await tx.order.create({
           data: {
             userId,
             paymentIntentId: paymentIntent.id,
             status: 'PENDING',
+            orderNumber,
+            firstName,
+            lastName,
+            phone,
+            secondaryPhone,
+            address1,
+            address2,
+            city,
+            state,
+            postalCode,
+            country,
+            instructions,
             items: {
               create: items.map((it) => {
                 const product = products.find((p) => p.id === it.id)!
