@@ -1,6 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import multer from 'fastify-multer'
+import type { File } from 'fastify-multer/lib/interfaces'
 import sharp from 'sharp'
 import { join } from 'path'
 import { IMG_BASE } from '../env'
@@ -25,7 +26,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
     '/upload',
     { preHandler: upload.single('image') },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const file = (request as FastifyRequest & { file?: Express.Multer.File }).file
+      const file = (request as FastifyRequest & { file?: File }).file
       if (!file) {
         reply.code(400)
         return { error: 'No file uploaded' }
@@ -34,7 +35,7 @@ const productsRoutes: FastifyPluginAsync = async (fastify) => {
         reply.code(400)
         return { error: 'Invalid file type' }
       }
-      if (file.size > MAX_FILE_SIZE) {
+      if ((file.size ?? 0) > MAX_FILE_SIZE) {
         reply.code(400)
         return { error: 'File too large' }
       }
