@@ -33,4 +33,26 @@ describe('sendAdminOrderNotification', () => {
 
     spy.mockRestore()
   })
+
+  it('omits phone line when phone is missing', async () => {
+    const spy = vi.spyOn(mailer, 'sendMail').mockResolvedValue({} as any)
+    const order = {
+      id: 'o2',
+      items: [{ productId: 'p1', quantity: 1, price: 1 }],
+      firstName: 'A',
+      lastName: 'B',
+      address1: 'addr1',
+      city: 'City',
+      state: 'ST',
+      postalCode: '12345',
+      country: 'US',
+    }
+
+    await mailer.sendAdminOrderNotification(order as any, 'admin@example.com')
+
+    const args = spy.mock.calls[0][0]
+    expect(args.html).not.toContain('Phone:')
+
+    spy.mockRestore()
+  })
 })
