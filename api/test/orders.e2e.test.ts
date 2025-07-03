@@ -29,6 +29,18 @@ describe('latest order endpoint', () => {
       data: {
         userId: user.id,
         status: 'PAID',
+        orderNumber: 'ORD-1',
+        firstName: 'A',
+        lastName: 'B',
+        phone: '1',
+        secondaryPhone: '2',
+        address1: '123',
+        address2: 'apt',
+        city: 'C',
+        state: 'ST',
+        postalCode: '000',
+        country: 'US',
+        instructions: 'n/a',
         items: { create: [{ productId: product.id, quantity: 2, price: 5 }] },
       },
     })
@@ -42,5 +54,17 @@ describe('latest order endpoint', () => {
     expect(res.body.id).toBe(latest.id)
     expect(res.body.items).toHaveLength(1)
     expect(res.body.total).toBe(10)
+    expect(res.body.orderNumber).toBe('ORD-1')
+    expect(res.body.firstName).toBe('A')
+    expect(res.body.lastName).toBe('B')
+    expect(res.body.phone).toBe('1')
+    expect(res.body.secondaryPhone).toBe('2')
+    expect(res.body.address1).toBe('123')
+    expect(res.body.address2).toBe('apt')
+    expect(res.body.city).toBe('C')
+    expect(res.body.state).toBe('ST')
+    expect(res.body.postalCode).toBe('000')
+    expect(res.body.country).toBe('US')
+    expect(res.body.instructions).toBe('n/a')
   })
 })

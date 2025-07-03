@@ -79,7 +79,23 @@ test('user signs up and completes purchase flow', async ({ page }) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ id: order.id, items: order.items, total: product.price }),
+      body: JSON.stringify({
+        id: order.id,
+        items: order.items,
+        total: product.price,
+        orderNumber: 'ORD-1',
+        firstName: 'A',
+        lastName: 'B',
+        phone: '1',
+        secondaryPhone: '2',
+        address1: '123',
+        address2: 'apt',
+        city: 'C',
+        state: 'ST',
+        postalCode: '000',
+        country: 'US',
+        instructions: 'n/a',
+      }),
     })
   })
 
