@@ -191,8 +191,27 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
       return { error: 'No orders found' }
     }
 
-    const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    return { id: order.id, items: order.items, total }
+    const total = order.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    )
+    return {
+      id: order.id,
+      items: order.items,
+      total,
+      orderNumber: order.orderNumber,
+      firstName: order.firstName,
+      lastName: order.lastName,
+      phone: order.phone,
+      secondaryPhone: order.secondaryPhone,
+      address1: order.address1,
+      address2: order.address2,
+      city: order.city,
+      state: order.state,
+      postalCode: order.postalCode,
+      country: order.country,
+      instructions: order.instructions,
+    }
   })
 }
 

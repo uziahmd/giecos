@@ -50,7 +50,22 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
   })
 
   await page.route('**/api/orders/latest', async (route) => {
-    const order = { id: 'order1', orderNumber: 'ORD-99', total: products[0].price }
+    const order = {
+      id: 'order1',
+      orderNumber: 'ORD-99',
+      total: products[0].price,
+      firstName: 'A',
+      lastName: 'B',
+      phone: '1',
+      secondaryPhone: '2',
+      address1: '123',
+      address2: 'apt',
+      city: 'C',
+      state: 'ST',
+      postalCode: '000',
+      country: 'US',
+      instructions: 'n/a',
+    }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(order) })
   })
 

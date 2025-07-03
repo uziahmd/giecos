@@ -93,7 +93,22 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ id: order.id, orderNumber: "ORD-1", total: order.items[0].price }),
+      body: JSON.stringify({
+        id: order.id,
+        orderNumber: "ORD-1",
+        total: order.items[0].price,
+        firstName: "A",
+        lastName: "B",
+        phone: "1",
+        secondaryPhone: "2",
+        address1: "123",
+        address2: "apt",
+        city: "C",
+        state: "ST",
+        postalCode: "000",
+        country: "US",
+        instructions: "n/a",
+      }),
     });
   });
 
