@@ -4,6 +4,7 @@ import * as mailer from '../src/lib/mailer'
 
 describe('sendAdminOrderNotification', () => {
   it('formats and sends admin notification', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spy = vi.spyOn(mailer, 'sendMail').mockResolvedValue({} as any)
     const order = {
       id: 'o1',

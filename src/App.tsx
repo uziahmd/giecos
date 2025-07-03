@@ -21,6 +21,7 @@ import ProductDetail from "@/pages/ProductDetail";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import Success from "@/pages/Success";
+import Shipping from "@/pages/Shipping";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Login from "@/pages/Login";
@@ -63,6 +64,7 @@ const App = () => {
               <Route path="/shop" element={<PageTransition><Shop /></PageTransition>} />
               <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
               <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
+              <Route path="/shipping" element={<PageTransition><Shipping /></PageTransition>} />
               <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
               <Route path="/success" element={<PageTransition><Success /></PageTransition>} />
               <Route path="/about" element={<PageTransition><About /></PageTransition>} />
