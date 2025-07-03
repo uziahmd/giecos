@@ -7,6 +7,7 @@ const {
   JWT_SECRET,
   RESEND_API_KEY,
   RESEND_FROM,
+  ADMIN_EMAIL,
   OTP_EXP_MINUTES,
   AIRWALLEX_CLIENT_ID,
   AIRWALLEX_API_KEY,
@@ -29,6 +30,7 @@ if (!DATABASE_URL) throw new Error('DATABASE_URL is required')
 if (!JWT_SECRET) throw new Error('JWT_SECRET is required')
 if (!RESEND_API_KEY) throw new Error('RESEND_API_KEY is required')
 if (!RESEND_FROM) throw new Error('RESEND_FROM is required')
+if (!ADMIN_EMAIL) throw new Error('ADMIN_EMAIL is required')
 if (!OTP_EXP_MINUTES) throw new Error('OTP_EXP_MINUTES is required')
 if (!AIRWALLEX_CLIENT_ID) throw new Error('AIRWALLEX_CLIENT_ID is required')
 if (!AIRWALLEX_API_KEY) throw new Error('AIRWALLEX_API_KEY is required')
@@ -46,4 +48,5 @@ export {
   AIRWALLEX_WEBHOOK_SECRET,
   FRONTEND_URL,
   PORT,
+  ADMIN_EMAIL,
 }

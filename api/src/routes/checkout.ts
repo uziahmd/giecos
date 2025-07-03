@@ -1,9 +1,9 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
-import { AIRWALLEX_WEBHOOK_SECRET } from '../env'
+import { AIRWALLEX_WEBHOOK_SECRET, ADMIN_EMAIL } from '../env'
 import { createHmac } from 'node:crypto'
 import { getAirwallexToken } from '../lib/airwallex'
-import { sendOrderReceipt } from '../lib/mailer'
+import { sendOrderReceipt, sendAdminOrderNotification } from '../lib/mailer'
 
 const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/checkout', { preHandler: fastify.authenticate }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -166,6 +166,7 @@ const checkoutRoutes: FastifyPluginAsync = async (fastify) => {
         })
         const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
         await sendOrderReceipt(order.id, order.user.email, total)
+        await sendAdminOrderNotification(order, ADMIN_EMAIL as string)
       } else if (event.type === 'payment_intent.failed') {
         await fastify.prisma.order.update({
           where: { paymentIntentId: event.data.id },
