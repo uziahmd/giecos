@@ -5,6 +5,7 @@ import { buildApp } from '../src/app'
 
 let app: ReturnType<typeof buildApp>
 let fetchMock: vi.Mock
+import { sendAdminOrderNotification, sendOrderReceipt } from '../src/lib/mailer'
 
 vi.mock('../src/lib/airwallex', () => ({
   getAirwallexToken: vi.fn().mockResolvedValue('tok'),
@@ -17,6 +18,7 @@ beforeAll(() => {
 
 vi.mock('../src/lib/mailer', () => ({
   sendOrderReceipt: vi.fn(() => Promise.resolve()),
+  sendAdminOrderNotification: vi.fn(() => Promise.resolve()),
 }))
 
 beforeAll(async () => {
@@ -107,6 +109,13 @@ describe('product and checkout flow', () => {
 
     const order = await app.prisma.order.findFirst({ where: { paymentIntentId: 'pi_1' } })
     expect(order?.status).toBe('PAID')
+    expect(order?.orderNumber).toBe('ORD-1')
+    expect(order?.firstName).toBe('A')
+    expect(order?.address1).toBe('addr1')
+    expect((sendAdminOrderNotification as unknown as vi.Mock).mock.calls.length).toBe(1)
+    const [calledOrder, adminEmail] = (sendAdminOrderNotification as unknown as vi.Mock).mock.calls[0]
+    expect(calledOrder.id).toBe(order?.id)
+    expect(adminEmail).toBe('admin@example.com')
   })
 
   it('rejects checkout with invalid quantity', async () => {

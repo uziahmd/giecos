@@ -24,7 +24,7 @@ global.fetch = vi.fn().mockResolvedValue({
 if (fs.existsSync('prisma/test.db')) {
   fs.rmSync('prisma/test.db')
 }
-execSync('pnpm exec prisma migrate deploy --schema=prisma/schema.prisma', {
+execSync('pnpm exec prisma db push --schema=prisma/schema.prisma', {
   stdio: 'inherit',
   env: { ...process.env, DATABASE_URL: CLI_DB_URL },
 })

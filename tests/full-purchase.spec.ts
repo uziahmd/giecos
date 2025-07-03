@@ -3,6 +3,15 @@ import { test, expect } from '@playwright/test'
 // mock server behavior via request interception
 
 test('admin adds product and shopper purchases it', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.Airwallex = {
+      loadAirwallex: () => Promise.resolve(),
+      createElement: () => ({
+        mount: () => {},
+        confirm: () => Promise.resolve(),
+      }),
+    }
+  })
   const adminEmail = 'admin@example.com'
   const shopperEmail = 'shopper@example.com'
   const products: Array<Record<string, unknown>> = []
@@ -37,16 +46,16 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
 
   await page.route('**/api/checkout', async (route) => {
     inbox.push('receipt')
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ url: '/success' }) })
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 'pi_1', client_secret: 'secret' }) })
   })
 
   await page.route('**/api/orders/latest', async (route) => {
-    const order = { id: 'order1', total: products[0].price }
+    const order = { id: 'order1', orderNumber: 'ORD-99', total: products[0].price }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(order) })
   })
 
   // admin login and add product
-  await page.goto('http://localhost:5173/login')
+  await page.goto('/login')
   await page.fill('input[name="email"]', adminEmail)
   await page.fill('input[name="password"]', 'secret')
   await Promise.all([
@@ -54,7 +63,7 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
     page.getByRole('button', { name: /sign in/i }).click(),
   ])
 
-  await page.goto('http://localhost:5173/admin')
+  await page.goto('/admin')
   await page.getByText('Add Product').click()
   await page.fill('input[name="name"]', 'Playwright Product')
   await page.fill('input[name="price"]', '99.99')
@@ -67,7 +76,7 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
   await expect(page.getByText('Playwright Product')).toBeVisible()
 
   // shopper login
-  await page.goto('http://localhost:5173/login')
+  await page.goto('/login')
   await page.fill('input[name="email"]', shopperEmail)
   await page.fill('input[name="password"]', 'secret')
   await Promise.all([
@@ -75,16 +84,31 @@ test('admin adds product and shopper purchases it', async ({ page }) => {
     page.getByRole('button', { name: /sign in/i }).click(),
   ])
 
-  await page.goto('http://localhost:5173/shop')
+  await page.goto('/shop')
   await page.getByText('Playwright Product').click()
   await page.getByRole('button', { name: /add to cart/i }).click()
 
-  await page.goto('http://localhost:5173/cart')
+  await page.goto('/cart')
+  await page.getByRole('button', { name: /proceed to checkout/i }).click()
+  await expect(page).toHaveURL(/\/shipping$/)
+
+  await page.fill('input[name="orderNumber"]', 'ORD-99')
+  await page.fill('input[name="firstName"]', 'A')
+  await page.fill('input[name="address1"]', '123 St')
+  await page.fill('input[name="city"]', 'City')
+  await page.fill('input[name="state"]', 'ST')
+  await page.fill('input[name="postalCode"]', '00000')
+  await page.fill('input[name="country"]', 'US')
+
   await Promise.all([
     page.waitForResponse((res) => res.url().endsWith('/api/checkout')),
-    page.getByRole('button', { name: /proceed to checkout/i }).click(),
+    page.getByRole('button', { name: /continue to payment/i }).click(),
   ])
 
+  await expect(page).toHaveURL(/\/checkout\?/)
+
+  await page.getByRole('button', { name: /pay now/i }).click()
   await expect(page).toHaveURL(/\/success$/)
+  await expect(page.getByText('ORD-99')).toBeVisible()
   expect(inbox.length).toBeGreaterThan(0)
 })
