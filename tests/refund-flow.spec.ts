@@ -3,6 +3,15 @@ import { test, expect } from "@playwright/test";
 // full flow: upload image, purchase product, refund order
 
 test("admin uploads product image, purchase then refund", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.Airwallex = {
+      loadAirwallex: () => Promise.resolve(),
+      createElement: () => ({
+        mount: () => {},
+        confirm: () => Promise.resolve(),
+      }),
+    };
+  });
   const adminEmail = "admin@example.com";
   const shopperEmail = "shopper@example.com";
 
@@ -75,7 +84,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ url: "/success" }),
+      body: JSON.stringify({ id: "pi_1", client_secret: "secret" }),
     });
   });
 
@@ -84,7 +93,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ id: order.id, total: order.items[0].price }),
+      body: JSON.stringify({ id: order.id, orderNumber: "ORD-1", total: order.items[0].price }),
     });
   });
 
@@ -108,7 +117,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
   });
 
   // admin login
-  await page.goto("http://localhost:5173/login");
+  await page.goto("/login");
   await page.fill('input[name="email"]', adminEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -116,7 +125,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:5173/admin");
+  await page.goto("/admin");
   await page.getByText("Add Product").click();
 
   await page.setInputFiles('input[type="file"]', "public/placeholder.svg");
@@ -138,7 +147,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
   await expect(page.getByText("Refundable Item")).toBeVisible();
 
   // shopper login and purchase
-  await page.goto("http://localhost:5173/login");
+  await page.goto("/login");
   await page.fill('input[name="email"]', shopperEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -146,19 +155,35 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:5173/shop");
+  await page.goto("/shop");
   await page.getByText("Refundable Item").click();
   await page.getByRole("button", { name: /add to cart/i }).click();
 
-  await page.goto("http://localhost:5173/cart");
+  await page.goto("/cart");
+  await page.getByRole("button", { name: /proceed to checkout/i }).click();
+  await expect(page).toHaveURL(/\/shipping$/);
+
+  await page.fill('input[name="orderNumber"]', 'ORD-1');
+  await page.fill('input[name="firstName"]', 'A');
+  await page.fill('input[name="address1"]', '123 St');
+  await page.fill('input[name="city"]', 'City');
+  await page.fill('input[name="state"]', 'ST');
+  await page.fill('input[name="postalCode"]', '00000');
+  await page.fill('input[name="country"]', 'US');
+
   await Promise.all([
     page.waitForResponse((res) => res.url().endsWith("/api/checkout")),
-    page.getByRole("button", { name: /proceed to checkout/i }).click(),
+    page.getByRole("button", { name: /continue to payment/i }).click(),
   ]);
+
+  await expect(page).toHaveURL(/\/checkout\?/);
+
+  await page.getByRole("button", { name: /pay now/i }).click();
   await expect(page).toHaveURL(/\/success$/);
+  await expect(page.getByText('ORD-1')).toBeVisible();
 
   // admin refund flow
-  await page.goto("http://localhost:5173/login");
+  await page.goto("/login");
   await page.fill('input[name="email"]', adminEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -166,7 +191,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:5173/admin");
+  await page.goto("/admin");
   await Promise.all([
     page.waitForResponse((res) => res.url().includes("/refund")),
     page.getByRole("button", { name: "Refund" }).click(),
