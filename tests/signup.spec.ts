@@ -36,7 +36,7 @@ test('user can sign up and verify account', async ({ page }) => {
     })
   })
 
-  await page.goto('http://localhost:8080/signup')
+  await page.goto('http://localhost:5173/signup')
   await page.getByLabel('Full Name').fill('E2E User')
   await page.getByLabel('Email address').fill(email)
   await page.getByLabel('Password').fill('secret')
@@ -57,6 +57,6 @@ test('user can sign up and verify account', async ({ page }) => {
     page.getByRole('button', { name: /verify account/i }).click(),
   ])
 
-  await page.goto('http://localhost:8080/account')
+  await page.goto('http://localhost:5173/account')
   await expect(page.getByText(email)).toBeVisible()
 })

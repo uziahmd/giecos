@@ -92,7 +92,7 @@ test('user signs up and completes purchase flow', async ({ page }) => {
   })
 
   // sign up flow
-  await page.goto('http://localhost:8080/signup')
+  await page.goto('http://localhost:5173/signup')
   await page.getByLabel('Full Name').fill('E2E Buyer')
   await page.getByLabel('Email address').fill(email)
   await page.getByLabel('Password').fill('secret')
@@ -109,7 +109,7 @@ test('user signs up and completes purchase flow', async ({ page }) => {
   ])
 
   // shopping flow
-  await page.goto('http://localhost:8080/shop')
+  await page.goto('http://localhost:5173/shop')
   await page.getByText(product.name).click()
 
   // SEO title check
@@ -117,7 +117,7 @@ test('user signs up and completes purchase flow', async ({ page }) => {
 
   await page.getByRole('button', { name: /add to cart/i }).click()
 
-  await page.goto('http://localhost:8080/cart')
+  await page.goto('http://localhost:5173/cart')
   await Promise.all([
     page.waitForResponse(res => res.url().endsWith('/api/checkout')),
     page.getByRole('button', { name: /proceed to checkout/i }).click(),
@@ -125,6 +125,6 @@ test('user signs up and completes purchase flow', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/success$/)
 
-  await page.goto('http://localhost:8080/account/orders')
+  await page.goto('http://localhost:5173/account/orders')
   await expect(page.getByText(product.name)).toBeVisible()
 })

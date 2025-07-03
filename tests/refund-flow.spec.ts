@@ -108,7 +108,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
   });
 
   // admin login
-  await page.goto("http://localhost:8080/login");
+  await page.goto("http://localhost:5173/login");
   await page.fill('input[name="email"]', adminEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -116,7 +116,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:8080/admin");
+  await page.goto("http://localhost:5173/admin");
   await page.getByText("Add Product").click();
 
   await page.setInputFiles('input[type="file"]', "public/placeholder.svg");
@@ -138,7 +138,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
   await expect(page.getByText("Refundable Item")).toBeVisible();
 
   // shopper login and purchase
-  await page.goto("http://localhost:8080/login");
+  await page.goto("http://localhost:5173/login");
   await page.fill('input[name="email"]', shopperEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -146,11 +146,11 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:8080/shop");
+  await page.goto("http://localhost:5173/shop");
   await page.getByText("Refundable Item").click();
   await page.getByRole("button", { name: /add to cart/i }).click();
 
-  await page.goto("http://localhost:8080/cart");
+  await page.goto("http://localhost:5173/cart");
   await Promise.all([
     page.waitForResponse((res) => res.url().endsWith("/api/checkout")),
     page.getByRole("button", { name: /proceed to checkout/i }).click(),
@@ -158,7 +158,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
   await expect(page).toHaveURL(/\/success$/);
 
   // admin refund flow
-  await page.goto("http://localhost:8080/login");
+  await page.goto("http://localhost:5173/login");
   await page.fill('input[name="email"]', adminEmail);
   await page.fill('input[name="password"]', "secret");
   await Promise.all([
@@ -166,7 +166,7 @@ test("admin uploads product image, purchase then refund", async ({ page }) => {
     page.getByRole("button", { name: /sign in/i }).click(),
   ]);
 
-  await page.goto("http://localhost:8080/admin");
+  await page.goto("http://localhost:5173/admin");
   await Promise.all([
     page.waitForResponse((res) => res.url().includes("/refund")),
     page.getByRole("button", { name: "Refund" }).click(),

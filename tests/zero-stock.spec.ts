@@ -27,7 +27,7 @@ test('product with zero stock shows Unavailable and disables add to cart', async
     })
   })
 
-  await page.goto('http://localhost:8080/product/out-item')
+  await page.goto('http://localhost:5173/product/out-item')
   await expect(page.getByText('Unavailable')).toBeVisible()
   await expect(page.getByRole('button', { name: /add to cart/i })).toBeDisabled()
 })
